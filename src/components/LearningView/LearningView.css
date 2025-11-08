@@ -1,0 +1,209 @@
+/* ===== LearningView.css ===== */
+
+.learning-container {
+  display: flex;
+  height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 280px;
+  background-color: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.sidebar h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #374151;
+}
+
+.module {
+  margin-bottom: 20px;
+}
+
+.module-title {
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.concept {
+  list-style: none;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #4b5563;
+  transition: 0.2s;
+}
+
+.concept:hover {
+  background-color: #e5e7eb;
+}
+
+.concept.done {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.check-icon {
+  color: #10b981;
+  margin-left: 6px;
+}
+
+/* ===== Main Slide Area ===== */
+.slide-area {
+  flex: 1;
+  padding: 40px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.slide-header {
+  margin-bottom: 20px;
+}
+
+.slide-header h2 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.slide-count {
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #e5e7eb;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #6ee7b7;
+  transition: width 0.3s ease;
+}
+
+/* ===== Slide Content ===== */
+.slide-body {
+  flex: 1;
+}
+
+.explanation {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  color: #374151;
+}
+
+.example-box {
+  background-color: #fef9c3;
+  border-left: 4px solid #facc15;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.tip-box {
+  background-color: #d1fae5;
+  border-left: 4px solid #10b981;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tip-icon {
+  color: #10b981;
+}
+
+/* ===== Footer Navigation ===== */
+.slide-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  gap: 10px;
+}
+
+.nav-btn,
+.understood-btn,
+.report-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-btn {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.nav-btn:hover {
+  background-color: #d1d5db;
+}
+
+.understood-btn {
+  background-color: #6ee7b7;
+  color: #065f46;
+}
+
+.understood-btn:hover {
+  background-color: #34d399;
+}
+
+.report-btn {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.report-btn:hover {
+  background-color: #fecaca;
+}
+
+/* ===== Take Exam Button ===== */
+.btn.exam {
+  background-color: #FEF3C7; /* light yellow */
+  color: #92400E;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn.exam:hover {
+  background-color: #FDE68A; /* slightly darker yellow */
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .learning-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .slide-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
