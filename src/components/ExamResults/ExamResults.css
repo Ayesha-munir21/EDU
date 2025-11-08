@@ -45,12 +45,35 @@ body {
 /* ===== Summary Section ===== */
 .summary {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
   background: #ecfdf5;
   border: 2px solid #a7f3d0;
   border-radius: 18px;
   padding: 25px;
   margin-bottom: 40px;
+  text-align: center;
+  flex-wrap: wrap;
+}
+.summary-box {
+  min-width: 180px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 700px) {
+  .summary {
+    flex-direction: column;
+    gap: 20px;
+    padding: 18px 5px;
+  }
+  .summary-box {
+    min-width: 120px;
+    padding: 8px 0;
+  }
 }
 .summary-box h3 {
   color: #047857;
@@ -68,6 +91,7 @@ body {
   font-size: 1.4rem;
 }
 .status.passed {
+  margin-left:50px;
   color: #16a34a;
 }
 .status.failed {

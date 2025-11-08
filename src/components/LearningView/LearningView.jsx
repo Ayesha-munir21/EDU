@@ -7,6 +7,7 @@ import {
   FaArrowRight,
   FaFlag,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const modulesData = [
   {
@@ -58,6 +59,7 @@ const slidesData = [
 const LearningView = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [understood, setUnderstood] = useState([]);
+  const navigate = useNavigate();
 
   const totalSlides = slidesData.length;
 
@@ -102,6 +104,16 @@ const LearningView = () => {
             </ul>
           </div>
         ))}
+        {/* ===== Take Exam Tab ===== */}
+        <div className="module">
+          <div
+            className="module-title"
+            style={{ background: '#FECACA', cursor: 'pointer' }}
+            onClick={() => navigate('/exam-catalog', { state: { trackName: 'General Exam' } })}
+          >
+            <b>Take Exam</b>
+          </div>
+        </div>
       </aside>
 
       {/* ===== Main Slide Area ===== */}
