@@ -9,6 +9,18 @@ const ProgressAchievements = () => {
   const navigate = useNavigate();
   const percentage = 78;
 
+  // ✅ Modal State & Functions
+  const [showDownloadModal, setShowDownloadModal] = React.useState(false);
+
+  const handleDownload = () => {
+    setShowDownloadModal(true);
+  };
+
+  const confirmDownload = () => {
+    setShowDownloadModal(false);
+   
+  };
+
   const achievements = [
     { icon: <Award />, title: "Completed 100 Slides", desc: "You’ve mastered 100 learning slides!" },
     { icon: <Trophy />, title: "Scored 90%+", desc: "High achiever in recent exams." },
@@ -71,14 +83,30 @@ const ProgressAchievements = () => {
         </div>
       </div>
 
-      {/* Download Button */}
-      <button className="download-btn" onClick={() => alert("Summary Downloaded!")}>
+      {/* ✅ Updated Download Button */}
+      <button className="download-btn" onClick={handleDownload}>
         <Download size={22} /> Download Summary
       </button>
 
       <button className="back-btn" onClick={() => navigate("/exam-results")}>
         Back to Results
       </button>
+
+      {/* ✅ Modal UI */}
+      {showDownloadModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h2>Download Summary?</h2>
+            <p>Do you want to download your progress summary?</p>
+
+            <div className="modal-buttons">
+              <button className="yes-btn" onClick={confirmDownload}>Yes, Download</button>
+              <button className="no-btn" onClick={() => setShowDownloadModal(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
