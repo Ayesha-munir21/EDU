@@ -57,6 +57,8 @@ const Auth = () => {
                 <input type="email" placeholder="Email" required />
                 <input type="password" placeholder="Password" required />
                 <div className="forgot">
+                  <a href="/profile">Profile</a>
+                  <a href="/purchases">Purchases</a>
                   <a href="#" onClick={(e) => e.preventDefault()}>
                     Forgot password?
                   </a>

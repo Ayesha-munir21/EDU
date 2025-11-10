@@ -6,7 +6,7 @@ import "./ExamCatalog.css";
 const ExamCatalog = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { trackId, trackName } = location.state || { trackName: "Sample Track" };
+  const { trackName } = location.state || { trackName: "Sample Track" };
 
   // Dummy exams
   const exams = [
