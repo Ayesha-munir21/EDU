@@ -59,9 +59,14 @@ const Auth = () => {
                 <div className="forgot">
                   <a href="/profile">Profile</a>
                   <a href="/purchases">Purchases</a>
-                  <a href="#" onClick={(e) => e.preventDefault()}>
+                  <button
+                    type="button"
+                    className="forgot-link"
+                    onClick={(e) => e.preventDefault() /* TODO: handle forgot password dialog */}
+                    style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, margin: 0, textDecoration: "underline", font: "inherit" }}
+                  >
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
                 <button type="submit" className="primary-btn">
                   Sign In
