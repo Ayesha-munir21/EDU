@@ -1,18 +1,26 @@
-import React from "react";
+import React, { useContext } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import "./TrackDetails.css";
 import { useNavigate } from "react-router-dom"; 
-
+import { AuthContext } from "../../AuthContext";
 
 const TrackDetails = () => {
-  const navigate = useNavigate(); // ✅ initialize navigate
+  const { user, enrolledCourses, setEnrolledCourses } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleEnroll = () => {
+    if (!enrolledCourses.includes("AWS")) {
+      setEnrolledCourses([...enrolledCourses, "AWS"]);
+    }
+    // After enrollment, navigate to dashboard
+    navigate("/success-enroll");
+  };
 
   return (
     <div className="track-details">
       {/* ===== Header Section ===== */}
       <header className="track-header">
         <div className="track-left">
-          {/* ===== AWS Logo and Title ===== */}
           <div className="track-title-row">
             <img
               src="https://cdn.worldvectorlogo.com/logos/amazon-web-services-2.svg"
@@ -25,30 +33,23 @@ const TrackDetails = () => {
             </div>
           </div>
 
-          {/* ===== Summary ===== */}
           <p className="summary">
             Start your cloud journey with AWS — learn essential cloud concepts,
             key AWS services, pricing, and best practices. Perfect for beginners
             preparing for their first cloud certification.
           </p>
 
-          {/* ===== Price & Buttons (Left aligned) ===== */}
-          <div className="price-section">
-            <h2 className="price">$49</h2>
-            <p className="bundle-note">🎁 Part of Cloud Bundle (Save 15%)</p>
-          </div>
-
+          
+          {/* ===== Enroll Button ===== */}
           <div className="track-actions-left">
-            <button className="btn add" onClick={() => navigate("/checkout")}>
-              Add to Cart
-            </button>
-            <button className="btn buy" onClick={() => navigate("/checkout")}>
-              Buy Now
+            <button className="btn enroll-btn" onClick={handleEnroll}>
+              Enroll Now
             </button>
           </div>
         </div>
       </header>
-       {/* ===== What You’ll Get Section ===== */}
+
+      {/* ===== What You’ll Get Section ===== */}
       <section className="tab-content">
         <h3>What You’ll Get</h3>
         <ul className="get-list">
@@ -58,7 +59,7 @@ const TrackDetails = () => {
         </ul>
       </section>
 
-      {/* ===== Certification Exam Details ===== */}
+      {/* ===== Exam Info ===== */}
       <section className="exam-info">
         <h3>Certification Exam Details</h3>
         <div className="info-grid">
@@ -83,10 +84,9 @@ const TrackDetails = () => {
         </p>
       </section>
 
-      {/* ===== Footer ===== */}
       <footer className="footer">
         <p>Terms | Privacy | Contact</p>
-        <p>© 2025 EduLearn — Learn. Grow. Achieve.</p>
+        <p>© 2025 Edora — Learn. Grow. Achieve.</p>
       </footer>
     </div>
   );

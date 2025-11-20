@@ -74,7 +74,7 @@ const handleBrowseNewTracks = () => {
     <div className="dashboard">
       {/* ===== NAVBAR (Only EduLearn, Dashboard, Browse More, Profile) ===== */}
       <header className="navbar">
-        <h1 className="logo">EduLearn</h1>
+        <h1 className="logo">Edora</h1>
         <nav className="nav-links">
           <a href="/" className="active">Dashboard</a>
         </nav>
@@ -84,7 +84,7 @@ const handleBrowseNewTracks = () => {
             <FaUserCircle className="profile-icon" />
             <div className="dropdown-menu">
               <a href="/profile">Profile</a>
-              <a href="/purchases">Purchases</a>
+             
               <button className="logout" onClick={handleLogout}>Logout</button>
 
             </div>
@@ -154,7 +154,12 @@ const handleBrowseNewTracks = () => {
             <div key={rec.id} className="rec-card">
               <img src={rec.icon} alt={rec.title} className="rec-icon-img" />
               <h3 className="rec-title">{rec.title}</h3>
-              <button className="view-details-btn">View Details</button>
+               <button
+      className="view-details-btn"
+      onClick={() => navigate(`/track/${rec.id}`)}
+    >
+      View Details
+    </button>
             </div>
           ))}
         </div>
@@ -163,7 +168,7 @@ const handleBrowseNewTracks = () => {
       {/* ===== FOOTER ===== */}
       <footer className="footer">
         <p>Terms | Privacy | Contact</p>
-        <p>© 2025 EduLearn — Learn. Grow. Achieve.</p>
+        <p>© 2025 Edora — Learn. Grow. Achieve.</p>
       </footer>
     </div>
   );

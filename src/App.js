@@ -14,6 +14,7 @@ import ExamPlayer from "./components/ExamPlayer/ExamPlayer";
 import ExamResults from "./components/ExamResults/ExamResults";
 import ProgressAchievements from "./components/ProgressAchievements/ProgressAchievements";
 import Profile from "./components/Profile/Profile"; 
+import SuccessEnroll from "./components/SuccessEnroll/SuccessEnroll";
 
 function App() {
   return (
@@ -31,7 +32,8 @@ function App() {
         <Route path="/progress" element={<ProgressAchievements />} />
         <Route path="/purchases" element={<CheckoutFlow />} />
         <Route path="/profile" element={<Profile />} />
-       
+       <Route path="/success-enroll" element={<SuccessEnroll />} />
+
 
 
 

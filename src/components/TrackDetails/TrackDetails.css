@@ -274,4 +274,19 @@ body {
   color: #10b981; /* mint green tick */
   font-size: 1.2rem;
 }
+.enroll-btn {
+  background-color: #34D399;  /* Mint green */
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  font-weight: 600;
+  font-size: 12px;
+  width:auto;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
 
+.enroll-btn:hover {
+  background-color: #10B981; /* darker mint */
+}

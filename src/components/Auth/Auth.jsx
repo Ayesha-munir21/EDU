@@ -1,22 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "./Auth.css";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../AuthContext"; // ✅ Import AuthContext
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ Get user and enrolledCourses from AuthContext
+  const { user, setUser, enrolledCourses } = useContext(AuthContext);
+
   // ===== Handle Sign In Submit =====
   const handleSignIn = (e) => {
-    e.preventDefault(); // Stop page refres
-    navigate("/dashboard"); // Redirect to Dashboard
+    e.preventDefault();
+
+    // Example: after sign in, set user object (replace with real auth)
+    setUser({ name: "Demo User", email: "demo@example.com" });
+
+    // ✅ Existing user with enrolled courses goes to dashboard
+    if (enrolledCourses.length > 0) {
+      navigate("/dashboard");
+    } else {
+      // ✅ New user stays on landing page
+      navigate("/");
+    }
   };
 
   // ===== Handle Sign Up Submit =====
   const handleSignUp = (e) => {
     e.preventDefault();
-    navigate("/dashboard"); // Redirect after account creation
+
+    // Example: after sign up, set user object
+    setUser({ name: "New User", email: "newuser@example.com" });
+
+    // ✅ New user stays on landing page
+    navigate("/");
   };
 
   return (
@@ -60,8 +79,17 @@ const Auth = () => {
                   <button
                     type="button"
                     className="forgot-link"
-                    onClick={(e) => e.preventDefault() /* TODO: handle forgot password dialog */}
-                    style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, margin: 0, textDecoration: "underline", font: "inherit" }}
+                    onClick={(e) => e.preventDefault()}
+                    style={{
+                      border: "none",
+                      background: "none",
+                      color: "#2563eb",
+                      cursor: "pointer",
+                      padding: 0,
+                      margin: 0,
+                      textDecoration: "underline",
+                      font: "inherit",
+                    }}
                   >
                     Forgot password?
                   </button>

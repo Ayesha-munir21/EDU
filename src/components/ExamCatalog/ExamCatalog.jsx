@@ -51,7 +51,7 @@ const startExam = (examId) => {
         <button className="back-btn" onClick={() => navigate("/dashboard")}>
           <FaArrowLeft /> Back to Dashboard
         </button>
-        <h1 className="exam-logo">EduLearn</h1>
+       
       </div>
 
       {/* ===== PAGE TITLE ===== */}
