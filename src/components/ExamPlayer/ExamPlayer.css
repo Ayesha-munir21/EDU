@@ -1,0 +1,262 @@
+/* =============================
+   EXAM PLAYER – Mint Green Theme
+   ============================= */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #f9fefb, #d1fae5); /* soft mint */
+  color: #1f2937;
+}
+
+/* ===== Outer Container ===== */
+.exam-player {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ===== Top Bar ===== */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #10b981, #34d399); /* mint green gradient */
+  color: white;
+  padding: 15px 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border-bottom: 3px solid #a7f3d0;
+}
+
+.exam-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.timer,
+.question-counter {
+  font-weight: 500;
+}
+
+/* ===== Submit Button ===== */
+.submit-btn {
+  background-color: #f43f5e;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.submit-btn:hover {
+  background-color: #e11d48;
+  transform: scale(1.05);
+}
+
+/* ===== Main Body ===== */
+.main-body {
+  flex: 1;
+  display: flex;
+  padding: 25px;
+  gap: 25px;
+  background: #f8fafc;
+}
+
+/* ===== Question Area ===== */
+.question-area {
+  flex: 3;
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.question-text {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  color: #065f46; /* dark mint text */
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.options label {
+  background-color: #f1f5f9;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.options label:hover {
+  background-color: #d1fae5; /* light mint hover */
+  border-color: #10b981;
+}
+
+/* ===== Controls ===== */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+}
+
+/* ===== Flag Button ===== */
+.flag-btn {
+  background-color: #facc15; /* yellow */
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #78350f;
+  transition: 0.3s;
+}
+.flag-btn:hover {
+  background-color: #fbbf24;
+}
+
+/* ===== Navigation Buttons ===== */
+.nav-buttons button {
+  background-color: #10b981; /* mint green */
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.nav-buttons button:hover {
+  background-color: #059669; /* darker mint hover */
+  transform: scale(1.05);
+}
+
+/* ===== Right Panel ===== */
+.right-panel {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.right-panel h3 {
+  color: #065f46;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.map-btn {
+  background-color: #e2e8f0;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.map-btn:hover {
+  background-color: #d1fae5; /* light mint hover */
+  transform: scale(1.1);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .main-body {
+    flex-direction: column;
+  }
+  .question-area, .right-panel {
+    width: 100%;
+  }
+}
+/* ================================
+   ✅ MODAL STYLES (add at bottom)
+   ================================ */
+
+/* Modal overlay (full screen, centered) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5); /* dark translucent backdrop */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Modal box */
+.modal-box {
+  width: 420px;
+  max-width: calc(100% - 40px);
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 12px 40px rgba(2,6,23,0.35);
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Headline and text */
+.modal-box h2 {
+  margin: 0 0 8px;
+  color: #065f46;
+}
+.modal-box p {
+  margin: 0 0 18px;
+  color: #374151;
+}
+
+/* Buttons row */
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Yes (primary) */
+.yes-btn {
+  background: #10b981;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* No (secondary) */
+.no-btn {
+  background: #facc15;
+  color: #1f2937;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Small responsive tweak */
+@media (max-width: 480px) {
+  .modal-box { padding: 16px; }
+  .yes-btn, .no-btn { padding: 10px 12px; font-size: 0.95rem; }
+}
