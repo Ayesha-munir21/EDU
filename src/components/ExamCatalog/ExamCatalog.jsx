@@ -25,7 +25,7 @@ const ExamCatalog = () => {
         return;
     }
     if (!user) {
-        navigate("/auth");
+        navigate("/login");
         return;
     }
 

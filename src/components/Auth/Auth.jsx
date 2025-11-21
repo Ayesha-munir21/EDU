@@ -12,6 +12,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   React.useEffect(() => {
     if (location.state && location.state.signup) {
@@ -77,6 +78,7 @@ const Auth = () => {
   // ===== Handle Sign In Submit (Login) =====
   const handleSignIn = async (e) => {
     e.preventDefault();
+    setLoading(true);
     
     const formData = new URLSearchParams();
     formData.append('username', signInData.email);
@@ -112,6 +114,8 @@ const Auth = () => {
     } catch (error) {
       console.error("Network Error during Sign In:", error);
       alert("A network error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -235,9 +239,13 @@ const Auth = () => {
                     Forgot password?
                   </button>
                 </div>
-                <button type="submit" className="primary-btn">
-                  Sign In
-                </button>
+                {loading ? (
+                  <div className="ui-spinner"><div className="spinner"></div></div>
+                ) : (
+                  <button type="submit" className="primary-btn">
+                    Sign In
+                  </button>
+                )}
               </form>
             </>
           ) : (

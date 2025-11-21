@@ -53,7 +53,7 @@ const Landing = () => {
 
   const handleTrackClick = (trackId) => {
     if (!user) {
-      navigate("/auth");
+      navigate("/login");
     } else {
       navigate(`/track/${trackId}`);
     }
@@ -107,7 +107,7 @@ const Landing = () => {
             >
               Browse Certifications
             </button>
-            <button className="secondary-btn" onClick={() => navigate(user ? "/dashboard" : "/auth")}>
+            <button className="secondary-btn" onClick={() => navigate(user ? "/dashboard" : "/login")}>
               Start Learning
             </button>
           </div>
