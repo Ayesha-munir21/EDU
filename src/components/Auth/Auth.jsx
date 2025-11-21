@@ -2,33 +2,24 @@ import React, { useState, useContext } from "react";
 import "./Auth.css";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
 import { AuthContext } from "../../AuthContext";
 
-// Define the API base URL
 export const API_BASE_URL = "https://ceretification-app.onrender.com";
-=======
-import { AuthContext } from "../../AuthContext"; // ✅ Import AuthContext
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
-<<<<<<< HEAD
   const { user, setUser, enrolledCourses } = useContext(AuthContext);
-  
-  // State for managing Sign In form inputs
-  const [signInData, setSignInData] = useState({ email: "", password: "" });
 
-  // State for managing Sign Up form inputs
+  const [signInData, setSignInData] = useState({ email: "", password: "" });
   const [signUpData, setSignUpData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    consents: { terms: false }, 
+    consents: { terms: false },
   });
 
   const handleInputChange = (e, formType) => {
@@ -47,8 +38,7 @@ const Auth = () => {
     }
   };
 
-
-  // ===== Helper to fetch user data after successful authentication =====
+  // Helper to fetch user data after successful authentication
   const fetchAndSetUser = async (token) => {
     try {
         const meResponse = await fetch(`${API_BASE_URL}/api/me`, {
@@ -79,7 +69,6 @@ const Auth = () => {
   const handleSignIn = async (e) => {
     e.preventDefault();
     
-    // 1. Create FormData for the OAuth2PasswordRequestForm expected by FastAPI
     const formData = new URLSearchParams();
     formData.append('username', signInData.email);
     formData.append('password', signInData.password);
@@ -88,8 +77,7 @@ const Auth = () => {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
-          // CRUCIAL for OAuth2PasswordRequestForm
-          'Content-Type': 'application/x-www-form-urlencoded', 
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: formData.toString(),
       });
@@ -97,14 +85,11 @@ const Auth = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // 2. SUCCESS: Store the token
         localStorage.setItem('accessToken', data.access_token);
         
-        // 3. Fetch user details and update context
         const userFetched = await fetchAndSetUser(data.access_token);
         
         if (userFetched) {
-             // Navigation logic remains the same
             if (enrolledCourses.length > 0) {
               navigate("/dashboard");
             } else {
@@ -112,7 +97,6 @@ const Auth = () => {
             }
         }
       } else {
-        // 4. ERROR Handling
         console.error("Sign In Failed:", data.detail);
         alert(`Login failed: ${data.detail || 'Invalid email or password'}`);
       }
@@ -136,13 +120,11 @@ const Auth = () => {
         return;
     }
 
-    // 1. Prepare JSON payload
     const payload = {
         firstName: signUpData.firstName,
         lastName: signUpData.lastName,
         email: signUpData.email,
         password: signUpData.password,
-        // Send the complete consents object required by the model
         consents: signUpData.consents, 
     };
 
@@ -158,15 +140,12 @@ const Auth = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // 2. SUCCESS: User created
         alert(`Account created successfully for ${data.user.email}. Please sign in.`);
         
-        // Switch to Sign In tab and pre-fill email
         setIsSignUp(false);
         setSignInData({ email: signUpData.email, password: '' });
         
       } else {
-        // 3. ERROR Handling (e.g., Email already registered)
         console.error("Sign Up Failed:", data.detail);
         alert(`Sign up failed: ${data.detail || 'An error occurred'}`);
       }
@@ -180,41 +159,6 @@ const Auth = () => {
   return (
     <div className="auth-container">
       {/* ===== Left Side (No UI change) ===== */}
-=======
-  // ✅ Get user and enrolledCourses from AuthContext
-  const { user, setUser, enrolledCourses } = useContext(AuthContext);
-
-  // ===== Handle Sign In Submit =====
-  const handleSignIn = (e) => {
-    e.preventDefault();
-
-    // Example: after sign in, set user object (replace with real auth)
-    setUser({ name: "Demo User", email: "demo@example.com" });
-
-    // ✅ Existing user with enrolled courses goes to dashboard
-    if (enrolledCourses.length > 0) {
-      navigate("/dashboard");
-    } else {
-      // ✅ New user stays on landing page
-      navigate("/");
-    }
-  };
-
-  // ===== Handle Sign Up Submit =====
-  const handleSignUp = (e) => {
-    e.preventDefault();
-
-    // Example: after sign up, set user object
-    setUser({ name: "New User", email: "newuser@example.com" });
-
-    // ✅ New user stays on landing page
-    navigate("/");
-  };
-
-  return (
-    <div className="auth-container">
-      {/* ===== Left Side ===== */}
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
       <div className="auth-left">
         <h1>Welcome to EduLearn 🎓</h1>
         <p>Your journey to certification starts here.</p>
@@ -226,11 +170,7 @@ const Auth = () => {
       {/* ===== Right Side ===== */}
       <div className="auth-right">
         <div className="auth-box">
-<<<<<<< HEAD
           {/* ===== Tabs (Sign In / Sign Up) (No UI change) ===== */}
-=======
-          {/* ===== Tabs (Sign In / Sign Up) ===== */}
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           <div className="auth-tabs">
             <button
               className={!isSignUp ? "tab active" : "tab"}
@@ -246,16 +186,11 @@ const Auth = () => {
             </button>
           </div>
 
-<<<<<<< HEAD
           {/* ===== Sign In Form (Integration changes applied) ===== */}
-=======
-          {/* ===== Sign In Form ===== */}
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           {!isSignUp ? (
             <>
               <h2>Sign In to Your Account</h2>
               <form onSubmit={handleSignIn}>
-<<<<<<< HEAD
                 <input 
                   type="email" 
                   placeholder="Email" 
@@ -272,10 +207,6 @@ const Auth = () => {
                   value={signInData.password}
                   onChange={(e) => handleInputChange(e, 'signIn')}
                 />
-=======
-                <input type="email" placeholder="Email" required />
-                <input type="password" placeholder="Password" required />
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
                 <div className="forgot">
                   <button
                     type="button"
@@ -301,16 +232,11 @@ const Auth = () => {
               </form>
             </>
           ) : (
-<<<<<<< HEAD
             /* ===== Create Account Form (Integration changes applied) ===== */
-=======
-            /* ===== Create Account Form ===== */
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
             <>
               <h2>Create a New Account</h2>
               <form onSubmit={handleSignUp}>
                 <div className="name-row">
-<<<<<<< HEAD
                   <input 
                     type="text" 
                     placeholder="First Name" 
@@ -344,18 +270,10 @@ const Auth = () => {
                   value={signUpData.password} 
                   onChange={(e) => handleInputChange(e, 'signUp')} 
                 />
-=======
-                  <input type="text" placeholder="First Name" required />
-                  <input type="text" placeholder="Last Name" required />
-                </div>
-                <input type="email" placeholder="Email" required />
-                <input type="password" placeholder="Password" required />
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
                 <input
                   type="password"
                   placeholder="Confirm Password"
                   required
-<<<<<<< HEAD
                   name="confirmPassword"
                   value={signUpData.confirmPassword}
                   onChange={(e) => handleInputChange(e, 'signUp')}
@@ -368,11 +286,6 @@ const Auth = () => {
                     checked={signUpData.consents.terms}
                     onChange={(e) => handleInputChange(e, 'signUp')}
                   /> I agree to the Terms &
-=======
-                />
-                <label className="checkbox">
-                  <input type="checkbox" required /> I agree to the Terms &
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
                   Privacy Policy
                 </label>
                 <button type="submit" className="primary-btn">
@@ -382,20 +295,12 @@ const Auth = () => {
             </>
           )}
 
-<<<<<<< HEAD
           {/* ===== OR Divider (No UI change) ===== */}
-=======
-          {/* ===== OR Divider ===== */}
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           <div className="divider">
             <span>or</span>
           </div>
 
-<<<<<<< HEAD
           {/* ===== Social Login Buttons (No UI change) ===== */}
-=======
-          {/* ===== Social Login Buttons ===== */}
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           <div className="social-buttons">
             <button className="google-btn">
               <FaGoogle className="icon" /> Continue with Google
@@ -410,8 +315,4 @@ const Auth = () => {
   );
 };
 
-<<<<<<< HEAD
 export default Auth;
-=======
-export default Auth;
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
