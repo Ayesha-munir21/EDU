@@ -23,7 +23,7 @@ const Dashboard = () => {
 
   const handleAvatarError = (e) => {
     // Fallback to generic user icon if API or network fails
-    e.target.src = "https://cdn-icons-png.flaticon.com/512/1077/1077114.png"; 
+    e.target.src = "https://cdn-icons-png.flaticon.com/512/2436/2436874.png"; 
   };
 
   // ===== 1. FETCH DASHBOARD DATA =====
