@@ -33,7 +33,7 @@ const Profile = () => {
     const fetchHistory = async () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
-          navigate("/auth");
+          navigate("/login");
           return;
       }
 

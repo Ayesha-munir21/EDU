@@ -44,7 +44,7 @@ const TrackDetails = () => {
   // 3. Handle Enrollment (POST /api/enroll/{track_id})
   const handleEnroll = async () => {
     if (!user) {
-      navigate("/auth");
+      navigate("/login");
       return;
     }
     setEnrolling(true);

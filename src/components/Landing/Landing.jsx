@@ -76,10 +76,10 @@ const Landing = () => {
         <div className="navbar-right">
           {!user && (
             <>
-              <button className="nav-btn" onClick={() => navigate("/auth")}>
+              <button className="nav-btn" onClick={() => navigate("/login")}>
                 Sign In
               </button>
-              <button className="nav-btn filled" onClick={() => navigate("/auth")}>
+              <button className="nav-btn filled" onClick={() => navigate("/login")}>
                 Create Account
               </button>
             </>

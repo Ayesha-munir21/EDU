@@ -26,7 +26,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/login" element={<Auth />} />
           
           {/* ✅ DYNAMIC TRACK ID ROUTE */}
           <Route path="/track/:trackId" element={<TrackDetails />} />
