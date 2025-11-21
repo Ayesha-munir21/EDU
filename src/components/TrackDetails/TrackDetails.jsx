@@ -1,11 +1,11 @@
-<<<<<<< HEAD
 import React, { useContext, useEffect, useState } from "react";
 import { FaCheckCircle, FaBookOpen, FaClipboardList } from "react-icons/fa";
 import "./TrackDetails.css";
 import { useNavigate, useParams } from "react-router-dom"; 
 import { AuthContext } from "../../AuthContext";
 
-export const API_BASE_URL = "https://ceretification-app.onrender.com";
+const API_BASE_URL = "https://ceretification-app.onrender.com";
+
 const TrackDetails = () => {
   const { trackId } = useParams();
   const { user, setUser } = useContext(AuthContext);
@@ -15,7 +15,7 @@ const TrackDetails = () => {
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
 
-  // 1. Fetch Track Details
+  // 1. Fetch Track Details from Backend
   useEffect(() => {
     const fetchTrackDetails = async () => {
       try {
@@ -41,7 +41,7 @@ const TrackDetails = () => {
   // 2. Check Entitlement
   const isEnrolled = user?.entitlements?.includes(`track:${trackId}`);
 
-  // 3. Handle Enrollment
+  // 3. Handle Enrollment (POST /api/enroll/{track_id})
   const handleEnroll = async () => {
     if (!user) {
       navigate("/auth");
@@ -60,6 +60,7 @@ const TrackDetails = () => {
 
       if (response.ok) {
         const data = await response.json();
+        // Update local user context with the new entitlement immediately
         const updatedUser = { 
             ...user, 
             entitlements: [...(user.entitlements || []), data.entitlement] 
@@ -67,16 +68,18 @@ const TrackDetails = () => {
         setUser(updatedUser);
         navigate("/success-enroll");
       } else {
-        alert("Enrollment failed.");
+        const errorData = await response.json();
+        alert(`Enrollment failed: ${errorData.detail}`);
       }
     } catch (error) {
       console.error("Enrollment error:", error);
+      alert("A network error occurred during enrollment.");
     } finally {
       setEnrolling(false);
     }
   };
 
-  // Navigation Handlers
+  // Navigation Handlers for Enrolled Users
   const goToLearning = () => {
     navigate("/learning", { state: { trackId: track._id || track.id, trackName: track.title } });
   };
@@ -85,39 +88,20 @@ const TrackDetails = () => {
     navigate("/exam-catalog", { state: { trackId: track._id || track.id, trackName: track.title } });
   };
 
-  if (loading) return <div style={{ padding: "50px", textAlign: "center" }}>Loading...</div>;
-  if (!track) return <div style={{ padding: "50px", textAlign: "center" }}>Track not found.</div>;
+  if (loading) {
+    return <div style={{ padding: "50px", textAlign: "center" }}>Loading Track Details...</div>;
+  }
+
+  if (!track) {
+    return <div style={{ padding: "50px", textAlign: "center" }}>Track not found.</div>;
+  }
 
   return (
     <div className="track-details">
-=======
-import React, { useContext } from "react";
-import { FaCheckCircle } from "react-icons/fa";
-import "./TrackDetails.css";
-import { useNavigate } from "react-router-dom"; 
-import { AuthContext } from "../../AuthContext";
-
-const TrackDetails = () => {
-  const { user, enrolledCourses, setEnrolledCourses } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  const handleEnroll = () => {
-    if (!enrolledCourses.includes("AWS")) {
-      setEnrolledCourses([...enrolledCourses, "AWS"]);
-    }
-    // After enrollment, navigate to dashboard
-    navigate("/success-enroll");
-  };
-
-  return (
-    <div className="track-details">
-      {/* ===== Header Section ===== */}
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
       <header className="track-header">
         <div className="track-left">
           <div className="track-title-row">
             <img
-<<<<<<< HEAD
               src={track.cover_image}
               alt={track.title}
               className="track-logo"
@@ -128,26 +112,16 @@ const TrackDetails = () => {
               <span className="badge">
                 {track.level ? track.level.toUpperCase() : "BEGINNER"} LEVEL
               </span>
-=======
-              src="https://cdn.worldvectorlogo.com/logos/amazon-web-services-2.svg"
-              alt="AWS Logo"
-              className="track-logo"
-            />
-            <div>
-              <h1>AWS Cloud Practitioner</h1>
-              <span className="badge">Beginner Level</span>
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
             </div>
           </div>
 
           <p className="summary">
-<<<<<<< HEAD
             {track.description || "Master the concepts and prepare for your certification exam."}
           </p>
 
           <div className="track-actions-left">
-            {/* ✅ LOGIC CHANGED HERE */}
             {!isEnrolled ? (
+              // SHOW ENROLL BUTTON IF NOT ENROLLED
               <button 
                   className="btn enroll-btn" 
                   onClick={handleEnroll} 
@@ -156,8 +130,8 @@ const TrackDetails = () => {
                 {enrolling ? "Enrolling..." : "Enroll Now"}
               </button>
             ) : (
+              // SHOW ACTION BUTTONS IF ENROLLED (NO DEAD END)
               <div style={{ display: 'flex', gap: '10px' }}>
-                {/* If Enrolled/Completed, show these buttons instead of "Go to Dashboard" */}
                 <button 
                   className="btn enroll-btn" 
                   onClick={goToLearning}
@@ -175,52 +149,26 @@ const TrackDetails = () => {
                 </button>
               </div>
             )}
-=======
-            Start your cloud journey with AWS — learn essential cloud concepts,
-            key AWS services, pricing, and best practices. Perfect for beginners
-            preparing for their first cloud certification.
-          </p>
-
-          
-          {/* ===== Enroll Button ===== */}
-          <div className="track-actions-left">
-            <button className="btn enroll-btn" onClick={handleEnroll}>
-              Enroll Now
-            </button>
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           </div>
         </div>
       </header>
 
-<<<<<<< HEAD
-      <section className="tab-content">
-        <h3>What You’ll Get</h3>
-        <ul className="get-list">
-          <li><FaCheckCircle className="check-icon" /> {track.exams_count || 0} Full-Length Practice Exams</li>
-          <li><FaCheckCircle className="check-icon" /> {track.concepts_count || 0} Learning Modules</li>
-          <li><FaCheckCircle className="check-icon" /> Lifetime Access</li>
-        </ul>
-      </section>
-
-=======
       {/* ===== What You’ll Get Section ===== */}
       <section className="tab-content">
         <h3>What You’ll Get</h3>
         <ul className="get-list">
-          <li><FaCheckCircle className="check-icon" /> 5 Full-Length Practice Exams</li>
-          <li><FaCheckCircle className="check-icon" /> Downloadable Study Materials (Slides + Notes)</li>
+          <li><FaCheckCircle className="check-icon" /> {track.exams_count || 0} Full-Length Practice Exams</li>
+          <li><FaCheckCircle className="check-icon" /> {track.concepts_count || 0} Learning Modules (Slides + Notes)</li>
           <li><FaCheckCircle className="check-icon" /> Lifetime Access with Free Updates</li>
         </ul>
       </section>
 
       {/* ===== Exam Info ===== */}
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
       <section className="exam-info">
         <h3>Certification Exam Details</h3>
         <div className="info-grid">
           <div className="info-box">
             <h4>Duration</h4>
-<<<<<<< HEAD
             <p>{track.duration_hours ? `${track.duration_hours} Hours` : "90 Minutes"}</p>
           </div>
           <div className="info-box">
@@ -228,45 +176,23 @@ const TrackDetails = () => {
             <p>Multiple-Choice Questions</p>
           </div>
           <div className="info-box">
-            <h4>Format</h4>
-            <p>Online Proctored</p>
-          </div>
-        </div>
-=======
-            <p>90 Minutes</p>
-          </div>
-          <div className="info-box">
-            <h4>Question Count</h4>
-            <p>65 Multiple-Choice Questions</p>
-          </div>
-          <div className="info-box">
             <h4>Exam Format</h4>
-            <p>Online Proctored or Test Center (Closed Book)</p>
+            <p>Online Proctored</p>
           </div>
         </div>
 
         <p className="exam-note">
-          The <strong>AWS Certified Cloud Practitioner</strong> exam validates
-          your understanding of AWS fundamentals and cloud concepts. Once
-          certified, your credential remains valid for <strong>3 years</strong>.
+          The <strong>{track.title}</strong> exam validates your understanding of core concepts. 
+          Once certified, your credential remains valid according to the vendor's policy.
         </p>
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
       </section>
 
       <footer className="footer">
         <p>Terms | Privacy | Contact</p>
-<<<<<<< HEAD
         <p>© 2025 Edora</p>
-=======
-        <p>© 2025 Edora — Learn. Grow. Achieve.</p>
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
       </footer>
     </div>
   );
 };
 
-<<<<<<< HEAD
 export default TrackDetails;
-=======
-export default TrackDetails;
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
