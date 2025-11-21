@@ -1,11 +1,10 @@
-<<<<<<< HEAD
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
 import "./Profile.css";
 import { FaTrophy, FaBookOpen, FaHistory, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-export const API_BASE_URL = "https://ceretification-app.onrender.com";
+const API_BASE_URL = "http://localhost:8000";
 
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -14,12 +13,9 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   
+  // State for Real History Data
   const [courseHistory, setCourseHistory] = useState([]);
   const [examHistory, setExamHistory] = useState([]);
-  
-  // Calculate stats directly from the user object first (Instant feedback)
-  const enrolledCount = user?.entitlements?.filter(e => e.startsWith('track:')).length || 0;
-
   const [stats, setStats] = useState({
     completedCourses: 0,
     totalExams: 0,
@@ -32,108 +28,103 @@ const Profile = () => {
     email: "",
   });
 
-  // 1. Initialize Data & Fetch History
+  // 1. Fetch Latest User Data & History on Mount
   useEffect(() => {
-    if (user) {
-        setProfileData({
-            firstName: user.firstName || "",
-            lastName: user.lastName || "",
-            email: user.email || "",
-        });
-    }
-
     const fetchHistory = async () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
+          navigate("/auth");
           return;
       }
 
       try {
-        // A. Refresh User Data (Background Sync)
+        // A. FORCE FETCH LATEST USER DATA (Fixes the "0 Enrolled" issue)
         const meRes = await fetch(`${API_BASE_URL}/api/me`, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        if (meRes.ok) {
-            const freshUser = await meRes.json();
-            setUser(freshUser); // Update global context
-        }
+        
+        if (!meRes.ok) throw new Error("Failed to refresh user data");
+        
+        const freshUser = await meRes.json();
+        // Update Context with fresh data
+        setUser(freshUser); 
+        
+        // Update local profile form
+        setProfileData({
+            firstName: freshUser.firstName || "",
+            lastName: freshUser.lastName || "",
+            email: freshUser.email || "",
+        });
 
-        // B. Use entitlements to get Track IDs
-        // We use 'user' from context if available, otherwise wait for refresh
-        const currentUser = user || {}; 
-        const trackIds = (currentUser.entitlements || [])
+        // B. Get Track IDs from the FRESH user object
+        const trackIds = (freshUser.entitlements || [])
             .filter(e => e.startsWith("track:"))
             .map(e => e.replace("track:", ""));
 
+        // If no enrollments, stop here
         if (trackIds.length === 0) {
             setLoading(false);
             return;
         }
 
+        const courses = [];
+        const exams = [];
+        let completedCount = 0;
+        let totalScore = 0;
+        let scoreCount = 0;
+
         // C. Fetch Details for each track
-        // We map the promises to a variable 'results'
-        const results = await Promise.all(trackIds.map(async (trackId) => {
-            try {
-                // Get Track Info
-                const trackRes = await fetch(`${API_BASE_URL}/api/tracks/${trackId}`);
-                const trackData = trackRes.ok ? await trackRes.json() : null;
+        await Promise.all(trackIds.map(async (trackId) => {
+            // Get Track Info
+            const trackRes = await fetch(`${API_BASE_URL}/api/tracks/${trackId}`);
+            const trackData = trackRes.ok ? await trackRes.json() : null;
 
-                // Get Progress
-                const progRes = await fetch(`${API_BASE_URL}/api/progress/${trackId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                const progData = progRes.ok ? await progRes.json() : { conceptStatuses: [], examStats: [] };
+            // Get Progress
+            const progRes = await fetch(`${API_BASE_URL}/api/progress/${trackId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const progData = progRes.ok ? await progRes.json() : null;
 
-                if (!trackData) return null;
-
-                // Data Processing
+            if (trackData && progData) {
+                // --- Course Calculation ---
                 const done = progData.conceptStatuses?.length || 0;
                 const total = trackData.concepts_count || 1;
                 const pct = Math.round((done / total) * 100);
                 const finalPct = pct > 100 ? 100 : pct;
+                
+                if (finalPct === 100) completedCount++;
 
-                // Exam Processing
-                const examsList = (progData.examStats || []).map(stat => ({
-                    id: stat.examId,
-                    trackTitle: trackData.title,
-                    score: stat.bestScore,
-                    attempts: stat.attempts,
-                    passed: stat.bestScore >= 70
-                }));
+                courses.push({
+                    id: trackData._id || trackData.id,
+                    title: trackData.title,
+                    progress: finalPct,
+                    status: finalPct === 100 ? "Completed" : "In Progress"
+                });
 
-                return {
-                    course: {
-                        id: trackData._id || trackData.id,
-                        title: trackData.title,
-                        progress: finalPct,
-                        status: finalPct === 100 ? "Completed" : "In Progress"
-                    },
-                    exams: examsList
-                };
-            } catch (e) {
-                console.error(e);
-                return null;
+                // --- Exam Calculation ---
+                if (progData.examStats) {
+                    progData.examStats.forEach(stat => {
+                        scoreCount++;
+                        totalScore += stat.bestScore;
+                        
+                        exams.push({
+                           id: stat.examId, 
+                           trackTitle: trackData.title,
+                           score: stat.bestScore,
+                           attempts: stat.attempts,
+                           passed: stat.bestScore >= 70
+                        });
+                    });
+                }
             }
         }));
-
-        // Filter out failed fetches
-        const validResults = results.filter(r => r !== null);
-
-        // Separate courses and exams
-        const courses = validResults.map(r => r.course);
-        const exams = validResults.flatMap(r => r.exams);
-
-        // Calculate Stats
-        const completedCount = courses.filter(c => c.progress === 100).length;
-        const totalScore = exams.reduce((acc, curr) => acc + curr.score, 0);
-        const avgScore = exams.length > 0 ? Math.round(totalScore / exams.length) : 0;
 
         setCourseHistory(courses);
         setExamHistory(exams);
         setStats({
             completedCourses: completedCount,
             totalExams: exams.length,
-            averageScore: avgScore
+            averageScore: scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0
         });
 
       } catch (err) {
@@ -144,39 +135,19 @@ const Profile = () => {
     };
 
     fetchHistory();
-  }, [user?.entitlements?.length]); // Re-run if entitlements change
+  }, [navigate, setUser]); // Depend on setUser to update context
+
 
   // Handlers
   const handleEditToggle = () => setIsEditing(!isEditing);
   
   const handleChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
-=======
-import React, { useState } from "react";
-import "./Profile.css";
-
-const Profile = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
-    name: "Asma Ali",
-    email: "asma@example.com",
-    enrolledTracks: "Web Development, Python",
-    completedExams: 3,
-  });
-
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing);
-  };
-
-  const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
   };
 
   const handleSave = () => {
     setIsEditing(false);
-<<<<<<< HEAD
-    alert("Profile update saved locally.");
+    alert("Profile update saved locally (Backend update not implemented yet).");
   };
 
   const handleDeleteAccount = async () => {
@@ -226,8 +197,8 @@ const Profile = () => {
              </div>
              <div className="stat-box">
                 <FaBookOpen className="icon-blue"/>
-                {/* ✅ DIRECT COUNT FROM USER CONTEXT */}
-                <h3>{enrolledCount}</h3>
+                {/* Use courseHistory.length directly for the enrolled count */}
+                <h3>{courseHistory.length}</h3>
                 <p>Enrolled</p>
              </div>
              <div className="stat-box">
@@ -279,9 +250,7 @@ const Profile = () => {
         {/* ===== Exam History Table ===== */}
         <div className="history-section">
             <h2><FaHistory /> Exam Performance</h2>
-            {loading ? <p>Loading...</p> : examHistory.length === 0 ? (
-                <p style={{color: '#666'}}>No exams taken yet.</p>
-            ) : (
+            {loading ? <p>Loading...</p> : examHistory.length === 0 ? <p>No exams taken yet.</p> : (
                 <table className="history-table">
                     <thead>
                         <tr>
@@ -318,83 +287,9 @@ const Profile = () => {
              </button>
         </div>
 
-=======
-    alert("✅ Profile updated successfully!");
-  };
-
-  return (
-    <div className="profile-wrapper">
-      <div className="profile-container">
-        <h1 className="profile-title">👤 My Profile</h1>
-
-        <div className="profile-card">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
-            alt="User Avatar"
-            className="profile-avatar"
-          />
-
-          {!isEditing ? (
-            <>
-              <h2>{profile.name}</h2>
-              <p><strong>Email:</strong> {profile.email}</p>
-              <p><strong>Enrolled Tracks:</strong> {profile.enrolledTracks}</p>
-              <p><strong>Completed Exams:</strong> {profile.completedExams}</p>
-
-              <button className="edit-btn" onClick={handleEditToggle}>
-                ✏️ Edit Profile
-              </button>
-            </>
-          ) : (
-            <div className="edit-section">
-              <input
-                type="text"
-                name="name"
-                value={profile.name}
-                onChange={handleChange}
-                placeholder="Enter Name"
-              />
-              <input
-                type="email"
-                name="email"
-                value={profile.email}
-                onChange={handleChange}
-                placeholder="Enter Email"
-              />
-              <input
-                type="text"
-                name="enrolledTracks"
-                value={profile.enrolledTracks}
-                onChange={handleChange}
-                placeholder="Enter Enrolled Tracks"
-              />
-              <input
-                type="number"
-                name="completedExams"
-                value={profile.completedExams}
-                onChange={handleChange}
-                placeholder="Completed Exams"
-              />
-
-              <div className="edit-actions">
-                <button className="save-btn" onClick={handleSave}>
-                  💾 Save
-                </button>
-                <button className="cancel-btn" onClick={handleEditToggle}>
-                  ❌ Cancel
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
       </div>
     </div>
   );
 };
 
-<<<<<<< HEAD
 export default Profile;
-=======
-export default Profile;
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
