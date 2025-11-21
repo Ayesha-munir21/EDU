@@ -79,7 +79,7 @@ const Landing = () => {
               <button className="nav-btn" onClick={() => navigate("/login")}>
                 Sign In
               </button>
-              <button className="nav-btn filled" onClick={() => navigate("/login")}>
+              <button className="nav-btn filled" onClick={() => navigate("/login", { state: { signup: true } })}>
                 Create Account
               </button>
             </>

@@ -1,7 +1,8 @@
 import React, { useState, useContext } from "react";
 import "./Auth.css";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
 
 export const API_BASE_URL = "https://ceretification-app.onrender.com";
@@ -9,6 +10,14 @@ export const API_BASE_URL = "https://ceretification-app.onrender.com";
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [showPassword, setShowPassword] = useState(false);
+
+  React.useEffect(() => {
+    if (location.state && location.state.signup) {
+      setIsSignUp(true);
+    }
+  }, [location.state]);
 
   const { user, setUser, enrolledCourses } = useContext(AuthContext);
 
@@ -199,14 +208,14 @@ const Auth = () => {
                   value={signInData.email}
                   onChange={(e) => handleInputChange(e, 'signIn')}
                 />
-                <input 
+                  <input 
                   type="password" 
-                  placeholder="Password" 
-                  required 
-                  name="password"
-                  value={signInData.password}
-                  onChange={(e) => handleInputChange(e, 'signIn')}
-                />
+                    placeholder="Password" 
+                    required 
+                    name="password"
+                    value={signInData.password}
+                    onChange={(e) => handleInputChange(e, 'signIn')}
+                  />
                 <div className="forgot">
                   <button
                     type="button"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import { FaCheckCircle } from "react-icons/fa";
@@ -13,6 +13,21 @@ const Dashboard = () => {
   const [enrolledTracks, setEnrolledTracks] = useState([]);
   const [recommended, setRecommended] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef();
+
+  // Close menu on click outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // ===== HELPER: Get Reliable Pixel Art Avatar (for Navbar & Welcome) =====
   const getAvatar = () => {
@@ -104,6 +119,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     setUser(null);
+    setShowMenu(false); // Hide dropdown on logout
     navigate("/");
   };
   const handleBrowseMore = () => {
@@ -124,23 +140,21 @@ const Dashboard = () => {
           <button className="browse-btn" onClick={handleBrowseMore}>
             Browse More
           </button>
-          <div className="profile-dropdown">
-            {/* Small Navbar Avatar */}
-            <div className="nav-avatar-container">
+          <div className="profile-dropdown" ref={menuRef}>
+            <div className="nav-avatar-container" onClick={() => setShowMenu((prev) => !prev)}>
                 <img 
                     src={getAvatar()} 
                     alt="Profile" 
                     className="nav-avatar-img" 
-                    onClick={() => navigate("/profile")} 
                     onError={handleAvatarError}
                 />
             </div>
-            <div className="dropdown-menu">
-              <button onClick={() => navigate("/profile")}>Profile</button>
-              <button className="logout" onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
+            {showMenu && (
+              <div className="dropdown-menu" style={{display: 'block'}}>
+                <button onClick={() => { setShowMenu(false); navigate("/profile") }}>Profile</button>
+                <button className="logout" onClick={handleLogout}>Logout</button>
+              </div>
+            )}
           </div>
         </div>
       </header>

@@ -10,7 +10,6 @@ const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   
   // State for Real History Data
@@ -139,14 +138,11 @@ const Profile = () => {
 
 
   // Handlers
-  const handleEditToggle = () => setIsEditing(!isEditing);
-  
   const handleChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
-    setIsEditing(false);
     alert("Profile update saved locally (Backend update not implemented yet).");
   };
 
@@ -160,133 +156,113 @@ const Profile = () => {
   return (
     <div className="profile-wrapper">
       <div className="profile-container">
-        <h1 className="profile-title">👤 My Profile & History</h1>
-
-        {/* ===== User Card ===== */}
+        <h1 className="profile-title highlight">
+          <span role="img" aria-label="avatar" style={{marginRight: '8px', verticalAlign: 'middle'}}>👤</span> My Profile & History
+        </h1>
         <div className="profile-card">
-          <div className="profile-header">
-             <img
+          <div className="profile-header-row">
+            <div className="profile-avatar-box">
+              <img
                 src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
                 alt="User Avatar"
                 className="profile-avatar"
-             />
-             <div className="profile-info">
-                {!isEditing ? (
-                    <>
-                    <h2>{profileData.firstName} {profileData.lastName}</h2>
-                    <p>{profileData.email}</p>
-                    </>
-                ) : (
-                    <div className="edit-inputs">
-                        <input name="firstName" value={profileData.firstName} onChange={handleChange} placeholder="First Name"/>
-                        <input name="lastName" value={profileData.lastName} onChange={handleChange} placeholder="Last Name"/>
-                    </div>
-                )}
-             </div>
-             <button className="edit-btn" onClick={!isEditing ? handleEditToggle : handleSave}>
-                {isEditing ? "💾 Save" : "✏️ Edit"}
-             </button>
+              />
+            </div>
+            <div className="profile-name-editrow">
+              <input name="firstName" value={profileData.firstName} onChange={handleChange} placeholder="First Name" className="profile-name-input"/>
+              <input name="lastName" value={profileData.lastName} onChange={handleChange} placeholder="Last Name" className="profile-name-input"/>
+              <button className="save-btn sticky-save" onClick={handleSave}>
+                <span role="img" aria-label="Save">💾</span> Save
+              </button>
+            </div>
           </div>
-
+          <div className="profile-email"><p>{profileData.email}</p></div>
           {/* ===== Stats Row ===== */}
           <div className="stats-grid">
-             <div className="stat-box">
-                <FaCheckCircle className="icon-green"/>
-                <h3>{stats.completedCourses}</h3>
-                <p>Courses Completed</p>
-             </div>
-             <div className="stat-box">
-                <FaBookOpen className="icon-blue"/>
-                {/* Use courseHistory.length directly for the enrolled count */}
-                <h3>{courseHistory.length}</h3>
-                <p>Enrolled</p>
-             </div>
-             <div className="stat-box">
-                <FaTrophy className="icon-yellow"/>
-                <h3>{stats.averageScore}%</h3>
-                <p>Avg. Score</p>
-             </div>
+            <div className="stat-box">
+              <FaCheckCircle className="icon-green" />
+              <h3>{stats.completedCourses}</h3>
+              <p>Courses Completed</p>
+            </div>
+            <div className="stat-box">
+              <FaBookOpen className="icon-blue" />
+              <h3>{courseHistory.length}</h3>
+              <p>Enrolled</p>
+            </div>
+            <div className="stat-box">
+              <FaTrophy className="icon-yellow" />
+              <h3>{stats.averageScore}%</h3>
+              <p>Avg. Score</p>
+            </div>
           </div>
         </div>
-
         {/* ===== Course History Table ===== */}
         <div className="history-section">
-            <h2><FaBookOpen /> Course History</h2>
-            {loading ? <p>Loading...</p> : courseHistory.length === 0 ? (
-                <div style={{padding: '10px', color: '#666', background: '#f9fafb', borderRadius: '8px'}}>
-                    You haven't enrolled in any courses yet. <a href="/dashboard" style={{color: '#10B981'}}>Go to Dashboard</a>
-                </div>
-            ) : (
-                <table className="history-table">
-                    <thead>
-                        <tr>
-                            <th>Course</th>
-                            <th>Progress</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {courseHistory.map((c, i) => (
-                            <tr key={i}>
-                                <td>{c.title}</td>
-                                <td>
-                                    <div className="mini-progress-bar">
-                                        <div className="mini-fill" style={{width: `${c.progress}%`, background: c.progress===100 ? '#10B981':'#3B82F6'}}></div>
-                                    </div>
-                                    <span className="mini-text">{c.progress}%</span>
-                                </td>
-                                <td>
-                                    <span className={`status-badge ${c.status === 'Completed' ? 'success' : 'pending'}`}>
-                                        {c.status}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+          <h2><FaBookOpen /> Course History</h2>
+          {loading ? <p>Loading...</p> : courseHistory.length === 0 ? (
+            <div style={{padding: '10px', color: '#666', background: '#f9fafb', borderRadius: '8px'}}>
+              You haven't enrolled in any courses yet. <a href="/dashboard" style={{color: '#10B981'}}>Go to Dashboard</a>
+            </div>
+          ) : (
+            <table className="history-table">
+              <thead>
+                <tr>
+                  <th>Course</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {courseHistory.map((c, i) => (
+                  <tr key={i}>
+                    <td>{c.title}</td>
+                    <td>
+                      <div className="mini-progress-bar">
+                        <div className="mini-fill" style={{width: `${c.progress}%`, background: c.progress===100 ? '#10B981':'#3B82F6'}}></div>
+                      </div>
+                      <span className="mini-text">{c.progress}%</span>
+                    </td>
+                    <td>
+                      <span className={`status-badge ${c.status === 'Completed' ? 'success' : 'pending'}`}>{c.status}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
-
         {/* ===== Exam History Table ===== */}
         <div className="history-section">
-            <h2><FaHistory /> Exam Performance</h2>
-            {loading ? <p>Loading...</p> : examHistory.length === 0 ? <p>No exams taken yet.</p> : (
-                <table className="history-table">
-                    <thead>
-                        <tr>
-                            <th>Track / Exam</th>
-                            <th>Attempts</th>
-                            <th>Best Score</th>
-                            <th>Result</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {examHistory.map((e, i) => (
-                            <tr key={i}>
-                                <td>{e.trackTitle}</td>
-                                <td>{e.attempts}</td>
-                                <td style={{fontWeight: 'bold'}}>{e.score}%</td>
-                                <td>
-                                    {e.passed ? (
-                                        <span className="status-badge success"><FaCheckCircle/> Passed</span>
-                                    ) : (
-                                        <span className="status-badge fail"><FaTimesCircle/> Failed</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+          <h2><FaHistory /> Exam Performance</h2>
+          {loading ? <p>Loading...</p> : examHistory.length === 0 ? <p>No exams taken yet.</p> : (
+            <table className="history-table">
+              <thead>
+                <tr>
+                  <th>Track / Exam</th>
+                  <th>Attempts</th>
+                  <th>Best Score</th>
+                  <th>Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {examHistory.map((e, i) => (
+                  <tr key={i}>
+                    <td>{e.trackTitle}</td>
+                    <td>{e.attempts}</td>
+                    <td style={{fontWeight: 'bold'}}>{e.score}%</td>
+                    <td>{e.passed ? (<span className="status-badge success"><FaCheckCircle/> Passed</span>) : (<span className="status-badge fail"><FaTimesCircle/> Failed</span>)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
-
         {/* Delete Account */}
         <div style={{marginTop: '40px', textAlign: 'center'}}>
-             <button className="delete-btn-text" onClick={handleDeleteAccount} style={{background:'none', border:'none', color:'red', cursor:'pointer', textDecoration:'underline'}}>
-                Delete My Account
-             </button>
+          <button className="delete-btn-text" onClick={handleDeleteAccount} style={{background:'none', border:'none', color:'red', cursor:'pointer', textDecoration:'underline'}}>
+            Delete My Account
+          </button>
         </div>
-
       </div>
     </div>
   );

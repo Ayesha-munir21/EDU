@@ -22,7 +22,6 @@ body { font-family: 'Inter', sans-serif; background-color: #F9FAFB; color: #1F29
 
 .profile-dropdown { position: relative; }
 .dropdown-menu { display: none; position: absolute; top: 50px; right: 0; background: white; border-radius: 10px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); min-width: 150px; z-index: 1000; }
-.profile-dropdown:hover .dropdown-menu { display: block; }
 .dropdown-menu button { display: block; width: 100%; text-align: left; padding: 10px 16px; color: #1F2937; text-decoration: none; font-size: 14px; background: none; border: none; cursor: pointer; }
 .dropdown-menu button:hover { background-color: #F0FDF4; }
 .logout { color: #dc2626 !important; font-weight: 600; }
