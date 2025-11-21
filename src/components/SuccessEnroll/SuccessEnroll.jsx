@@ -12,8 +12,8 @@ const SuccessEnroll = () => {
         <h2>You're Successfully Enrolled!</h2>
 
         <p className="msg">
-          Congrats! Your enrollment was successful.  
-          You can now access all your selected courses.
+          Congrats! Your enrollment was successful. 
+          You can now access all your selected courses and modules.
         </p>
 
         <button
@@ -27,8 +27,4 @@ const SuccessEnroll = () => {
   );
 };
 
-<<<<<<< HEAD
 export default SuccessEnroll;
-=======
-export default SuccessEnroll;
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
