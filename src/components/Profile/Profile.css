@@ -1,17 +1,16 @@
-<<<<<<< HEAD
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-=======
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
+
 .profile-wrapper {
   min-height: 100vh;
   background: linear-gradient(135deg, #fefce8, #d1fae5);
   display: flex;
-<<<<<<< HEAD
+
   align-items: flex-start; /* Changed to allow scrolling for long history */
-=======
+
   align-items: center;
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
+
   justify-content: center;
   padding: 40px 20px;
 }
@@ -21,17 +20,17 @@
   padding: 40px;
   border-radius: 20px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
-<<<<<<< HEAD
+
   max-width: 900px; /* Increased width to fit tables */
   width: 100%;
   transition: all 0.3s ease;
   margin-top: 20px;
-=======
+
   max-width: 480px;
   width: 100%;
   text-align: center;
   transition: all 0.3s ease;
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
+
 }
 
 .profile-title {
@@ -39,7 +38,7 @@
   font-weight: 700;
   color: #166534;
   margin-bottom: 25px;
-<<<<<<< HEAD
+
   text-align: center;
 }
 
@@ -216,7 +215,7 @@
 .status-badge.fail {
   background-color: #fee2e2;
   color: #991b1b;
-=======
+
 }
 
 .profile-avatar {
@@ -238,12 +237,12 @@
   font-size: 1rem;
   color: #374151;
   margin: 6px 0;
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
+
 }
 
 /* ===== BUTTONS ===== */
 .edit-btn {
-<<<<<<< HEAD
+
   background-color: #f3f4f6;
   color: #374151;
   padding: 8px 16px;
@@ -309,7 +308,7 @@
     width: 60px;
   }
 }
-=======
+.edit-btn{
   background-color: #86efac;
   color: #14532d;
   padding: 10px 22px;
@@ -381,4 +380,4 @@
 .cancel-btn:hover {
   transform: scale(1.05);
 }
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
+

@@ -109,8 +109,4 @@ body { font-family: 'Inter', sans-serif; background-color: #F9FAFB; color: #1F29
   .continue-card { flex-direction: column; text-align: center; gap: 1.5rem; }
   .track-actions { flex-direction: column; }
   .view-details-btn { width: 100%; }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> bed4647532d5219a6e8b75eb60a601424518ff9c
