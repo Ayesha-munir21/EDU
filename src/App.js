@@ -2,12 +2,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-<<<<<<< HEAD
-// ✅ Import AuthProvider so user state is available everywhere
+// Import AuthProvider (Assuming you have this context file created)
 import { AuthProvider } from "./AuthContext";
 
-=======
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
 // === Components ===
 import Landing from "./components/Landing/Landing";
 import Auth from "./components/Auth/Auth";
@@ -24,21 +21,19 @@ import SuccessEnroll from "./components/SuccessEnroll/SuccessEnroll";
 
 function App() {
   return (
-<<<<<<< HEAD
-    // ✅ Wrap the Router in AuthProvider
+    // Wrap the application with AuthProvider
     <AuthProvider>
       <Router>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
           
-          {/* ✅ Changed :id to :trackId to match TrackDetails.jsx */}
+          {/* ✅ DYNAMIC TRACK ID ROUTE */}
           <Route path="/track/:trackId" element={<TrackDetails />} />
           
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/checkout" element={<CheckoutFlow />} />
           
-          {/* Note: You might need to make these dynamic later (e.g., /learning/:trackId) */}
           <Route path="/learning" element={<LearningView />} />
           <Route path="/exam-catalog" element={<ExamCatalog />} />
           <Route path="/exam-player" element={<ExamPlayer />} /> 
@@ -55,30 +50,3 @@ function App() {
 }
 
 export default App;
-=======
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/track/:id" element={<TrackDetails />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/checkout" element={<CheckoutFlow />} />
-        <Route path="/learning" element={<LearningView />} />
-        <Route path="/exam-catalog" element={<ExamCatalog />} />
-        <Route path="/exam-player" element={<ExamPlayer />} /> 
-        <Route path="/exam-results" element={<ExamResults />} />
-        <Route path="/progress" element={<ProgressAchievements />} />
-        <Route path="/purchases" element={<CheckoutFlow />} />
-        <Route path="/profile" element={<Profile />} />
-       <Route path="/success-enroll" element={<SuccessEnroll />} />
-
-
-
-
-      </Routes>
-    </Router>
-  );
-}
-
-export default App;
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
