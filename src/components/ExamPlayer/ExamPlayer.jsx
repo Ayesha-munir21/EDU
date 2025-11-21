@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
 import "./ExamPlayer.css";
 
-export const API_BASE_URL = "https://ceretification-app.onrender.com";
+const API_BASE_URL = "https://ceretification-app.onrender.com";
 
 const ExamPlayer = () => {
   const location = useLocation();
@@ -29,10 +28,9 @@ const ExamPlayer = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  // Timer Ref
   const timerRef = useRef(null);
 
-  // 1. Start Exam Attempt on Mount
+  // 1. Start Exam Attempt on Mount (Timezone Fix Included)
   useEffect(() => {
     if (!examId || !user) return;
 
@@ -49,25 +47,22 @@ const ExamPlayer = () => {
           setAttemptId(data.attemptId);
           setQuestions(data.questions);
 
-          // ✅ TIMEZONE FIX: Force UTC Parsing
+          // TIMEZONE FIX: Force UTC Parsing
           if (data.expiresAt) {
             let expiresString = data.expiresAt;
-            // If string doesn't have timezone info, append 'Z' to force UTC
             if (!expiresString.endsWith("Z") && !expiresString.includes("+")) {
               expiresString += "Z";
             }
-
             const expiresAtMs = new Date(expiresString).getTime();
             setExpiryTimestamp(expiresAtMs);
 
-            // Calculate initial remaining time
             const now = Date.now();
             const remaining = Math.floor((expiresAtMs - now) / 1000);
             setTimeLeft(remaining > 0 ? remaining : 0);
           }
 
         } else {
-          alert("Could not start exam. Please try again.");
+          alert("Could not start exam.");
           navigate("/exam-catalog", { state: { trackId, trackName } });
         }
       } catch (error) {
@@ -89,7 +84,6 @@ const ExamPlayer = () => {
   useEffect(() => {
     if (!expiryTimestamp) return;
 
-    // Clear any existing timer
     if (timerRef.current) clearInterval(timerRef.current);
 
     timerRef.current = setInterval(() => {
@@ -99,7 +93,6 @@ const ExamPlayer = () => {
       if (diff <= 0) {
         setTimeLeft(0);
         clearInterval(timerRef.current);
-        // Optional: confirmSubmit(); // Auto-submit when time runs out
       } else {
         setTimeLeft(diff);
       }
@@ -189,7 +182,7 @@ const ExamPlayer = () => {
                 trackId: trackId,
                 trackName: trackName,
                 examId: examId,
-                // ✅ PASS NEXT EXAM DATA
+                // PASS NEXT EXAM DATA
                 nextExam: data.nextExam 
             } 
         });
@@ -209,49 +202,25 @@ const ExamPlayer = () => {
 
   const currentQuestion = questions[currentQuestionIndex];
   const currentSelected = answers[currentQuestion.id] || [];
-=======
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import "./ExamPlayer.css";
-
-const ExamPlayer = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { examId, trackName } = location.state || { examId: 1, trackName: "Sample Track" };
-
-  // ===== Modal state + handlers (add here) =====
-  const [showModal, setShowModal] = React.useState(false);
-
-  const handleSubmit = () => {
-    setShowModal(true);
-  };
-
-  const confirmSubmit = () => {
-    setShowModal(false);
-    navigate("/exam-results", { state: { score: 78, timeTaken: "1h 15m" } });
-  };
-  // ==============================================
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
 
   return (
     <>
       <div className="exam-player">
-<<<<<<< HEAD
-        {/* Top Bar */}
         <div className="top-bar">
           <h2 className="exam-title">{trackName} — {examTitle || `Exam`}</h2>
+          
           <div className="timer" style={{ color: timeLeft < 300 ? 'red' : 'inherit', fontWeight: 'bold' }}>
              ⏱ {formatTime(timeLeft)} left
           </div>
+          
           <div className="question-counter">Q {currentQuestionIndex + 1}/{questions.length}</div>
+          
           <button className="submit-btn" onClick={() => setShowModal(true)} disabled={isSubmitting}>
              {isSubmitting ? "Submitting..." : "Submit"}
           </button>
         </div>
 
-        {/* Main Body */}
         <div className="main-body">
-          {/* Left: Question Area */}
           <div className="question-area">
             <h2 className="question-text">{currentQuestion.stem || currentQuestion.question}</h2>
 
@@ -281,40 +250,10 @@ const ExamPlayer = () => {
               <div className="nav-buttons">
                 <button className="prev-btn" onClick={handlePrev} disabled={currentQuestionIndex === 0}>Previous</button>
                 <button className="next-btn" onClick={handleNext} disabled={currentQuestionIndex === questions.length - 1}>Next</button>
-=======
-        {/* ===== Top Bar ===== */}
-        <div className="top-bar">
-          <h2 className="exam-title">{trackName} — Exam {examId}</h2>
-          <div className="timer">⏱ 1:28:00 left</div>
-          <div className="question-counter">Q 5/50</div>
-          {/* changed to open modal */}
-          <button className="submit-btn" onClick={handleSubmit}>Submit</button>
-        </div>
-
-        {/* ===== Main Body ===== */}
-        <div className="main-body">
-          {/* ===== Left: Question Area ===== */}
-          <div className="question-area">
-            <h2 className="question-text">What is React primarily used for?</h2>
-
-            <div className="options">
-              <label><input type="radio" name="q1" /> Building user interfaces</label>
-              <label><input type="radio" name="q1" /> Data analysis</label>
-              <label><input type="radio" name="q1" /> Video rendering</label>
-              <label><input type="radio" name="q1" /> File management</label>
-            </div>
-
-            <div className="controls">
-              <button className="flag-btn">🚩 Flag Question</button>
-              <div className="nav-buttons">
-                <button className="prev-btn">Previous</button>
-                <button className="next-btn">Next</button>
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
               </div>
             </div>
           </div>
 
-<<<<<<< HEAD
           {/* Right: Question Map */}
           <div className="right-panel">
             <h3>Question Map</h3>
@@ -339,41 +278,20 @@ const ExamPlayer = () => {
                     </button>
                 );
               })}
-=======
-          {/* ===== Right: Question Map ===== */}
-          <div className="right-panel">
-            <h3>Question Map</h3>
-            <div className="map-grid">
-              {Array.from({ length: 50 }).map((_, i) => (
-                <button key={i} className="map-btn">{i + 1}</button>
-              ))}
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
             </div>
           </div>
         </div>
       </div>
 
-<<<<<<< HEAD
       {/* Modal */}
-=======
-      {/* ===== Modal (Add here, outside main .exam-player but inside returned fragment) ===== */}
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-box">
             <h2>Submit Exam?</h2>
-<<<<<<< HEAD
             <p>Are you sure you want to submit?</p>
             <div className="modal-buttons">
               <button className="yes-btn" onClick={confirmSubmit} disabled={isSubmitting}>Yes, Submit</button>
               <button className="no-btn" onClick={() => setShowModal(false)} disabled={isSubmitting}>Cancel</button>
-=======
-            <p>Are you sure you want to submit your exam?</p>
-
-            <div className="modal-buttons">
-              <button className="yes-btn" onClick={confirmSubmit}>Yes, Submit</button>
-              <button className="no-btn" onClick={() => setShowModal(false)}>Cancel</button>
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
             </div>
           </div>
         </div>
@@ -382,8 +300,4 @@ const ExamPlayer = () => {
   );
 };
 
-<<<<<<< HEAD
 export default ExamPlayer;
-=======
-export default ExamPlayer;
->>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
