@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useContext } from "react";
+=======
+import React, { useState } from "react";
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
 import "./LearningView.css";
 import {
   FaCheckCircle,
@@ -7,6 +11,7 @@ import {
   FaArrowRight,
   FaFlag,
 } from "react-icons/fa";
+<<<<<<< HEAD
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
 
@@ -150,20 +155,96 @@ const LearningView = () => {
     explanation: "Content loading...",
     example: "Please wait...",
     tip: ""
+=======
+import { useNavigate } from "react-router-dom";
+
+const modulesData = [
+  {
+    title: "1. Introduction",
+    color: "#A7F3D0",
+    concepts: [
+      { id: 1, title: "Welcome to the Course", understood: true },
+      { id: 2, title: "How This Works", understood: false },
+    ],
+  },
+  {
+    title: "2. Core Concepts",
+    color: "#FDE68A",
+    concepts: [
+      { id: 3, title: "Understanding VPCs", understood: false },
+      { id: 4, title: "Subnets Explained", understood: false },
+    ],
+  },
+];
+
+const slidesData = [
+  {
+    id: 1,
+    title: "Welcome to the Course",
+    explanation:
+      "This course will guide you through structured, bite-sized lessons designed for easy learning.",
+    example: "Example: You'll learn using real-world cloud setups and diagrams.",
+    tip: "Take notes as you go to strengthen your understanding!",
+  },
+  {
+    id: 2,
+    title: "How This Works",
+    explanation:
+      "Each concept is presented like a slide with clear examples and key takeaways.",
+    example: "Example: Visuals, code snippets, and stories for every topic.",
+    tip: "You can mark topics as understood and track your progress anytime.",
+  },
+  {
+    id: 3,
+    title: "Understanding VPCs",
+    explanation:
+      "A Virtual Private Cloud (VPC) is an isolated network environment in the cloud.",
+    example:
+      "Example: AWS VPC allows you to define subnets, route tables, and gateways.",
+    tip: "Think of a VPC as your personal data center in the cloud!",
+  },
+];
+
+const LearningView = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [understood, setUnderstood] = useState([]);
+  const navigate = useNavigate();
+
+  const totalSlides = slidesData.length;
+
+  const handleNext = () => {
+    if (currentSlide < totalSlides - 1) setCurrentSlide(currentSlide + 1);
+  };
+
+  const handlePrev = () => {
+    if (currentSlide > 0) setCurrentSlide(currentSlide - 1);
+  };
+
+  const handleMarkUnderstood = () => {
+    if (!understood.includes(currentSlide)) {
+      setUnderstood([...understood, currentSlide]);
+    }
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
   };
 
   return (
     <div className="learning-container">
       {/* ===== Sidebar ===== */}
       <aside className="sidebar">
+<<<<<<< HEAD
         <h3>{trackName || "Course Modules"}</h3>
         
         {modules.map((module, mIdx) => (
+=======
+        <h3>Modules</h3>
+        {modulesData.map((module, mIdx) => (
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           <div key={mIdx} className="module">
             <div className="module-title" style={{ background: module.color }}>
               {module.title}
             </div>
             <ul>
+<<<<<<< HEAD
               {module.concepts.map((concept) => {
                 const cId = getConceptId(concept);
                 const currentId = getConceptId(currentConcept);
@@ -188,31 +269,62 @@ const LearningView = () => {
           </div>
         ))}
 
+=======
+              {module.concepts.map((concept) => (
+                <li
+                  key={concept.id}
+                  className={`concept ${
+                    understood.includes(concept.id - 1) ? "done" : ""
+                  }`}
+                >
+                  {concept.title}{" "}
+                  {understood.includes(concept.id - 1) && (
+                    <FaCheckCircle className="check-icon" />
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
         {/* ===== Take Exam Tab ===== */}
         <div className="module">
           <div
             className="module-title"
             style={{ background: '#FECACA', cursor: 'pointer' }}
+<<<<<<< HEAD
             onClick={() => navigate('/exam-catalog', { state: { trackId, trackName } })}
+=======
+            onClick={() => navigate('/exam-catalog', { state: { trackName: 'General Exam' } })}
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           >
             <b>Take Exam</b>
           </div>
         </div>
+<<<<<<< HEAD
         
         <div style={{marginTop: '20px', textAlign: 'center'}}>
             <button onClick={() => navigate('/dashboard')} style={{background:'none', border:'none', color:'#666', textDecoration:'underline', cursor:'pointer'}}>
                 Exit to Dashboard
             </button>
         </div>
+=======
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
       </aside>
 
       {/* ===== Main Slide Area ===== */}
       <main className="slide-area">
         <div className="slide-header">
           <h2>
+<<<<<<< HEAD
             {currentConcept.title}
             <span className="slide-count">
               ({currentSlideIndex + 1}/{concepts.length})
+=======
+            {slidesData[currentSlide].title}{" "}
+            <span className="slide-count">
+              ({currentSlide + 1}/{totalSlides})
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
             </span>
           </h2>
 
@@ -220,13 +332,18 @@ const LearningView = () => {
             <div
               className="progress-fill"
               style={{
+<<<<<<< HEAD
                 width: `${((currentSlideIndex + 1) / concepts.length) * 100}%`,
+=======
+                width: `${((currentSlide + 1) / totalSlides) * 100}%`,
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
               }}
             ></div>
           </div>
         </div>
 
         <div className="slide-body">
+<<<<<<< HEAD
           <p className="explanation">{slideContent.explanation}</p>
           
           {slideContent.example && (
@@ -240,6 +357,15 @@ const LearningView = () => {
                 <FaLightbulb className="tip-icon" /> {slideContent.tip}
               </div>
           )}
+=======
+          <p className="explanation">{slidesData[currentSlide].explanation}</p>
+          <div className="example-box">
+            <strong>Example:</strong> {slidesData[currentSlide].example}
+          </div>
+          <div className="tip-box">
+            <FaLightbulb className="tip-icon" /> {slidesData[currentSlide].tip}
+          </div>
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
         </div>
 
         {/* ===== Bottom Navigation ===== */}
@@ -247,11 +373,16 @@ const LearningView = () => {
           <button
             className="nav-btn"
             onClick={handlePrev}
+<<<<<<< HEAD
             disabled={currentSlideIndex === 0}
+=======
+            disabled={currentSlide === 0}
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           >
             <FaArrowLeft /> Previous
           </button>
 
+<<<<<<< HEAD
           <button 
             className={`understood-btn ${understoodIds.includes(getConceptId(currentConcept)) ? 'completed' : ''}`} 
             onClick={handleMarkUnderstood}
@@ -259,12 +390,20 @@ const LearningView = () => {
           >
             <FaCheckCircle /> 
             {understoodIds.includes(getConceptId(currentConcept)) ? "Understood" : "Mark as Understood"}
+=======
+          <button className="understood-btn" onClick={handleMarkUnderstood}>
+            <FaCheckCircle /> Mark as Understood
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           </button>
 
           <button
             className="nav-btn"
             onClick={handleNext}
+<<<<<<< HEAD
             disabled={currentSlideIndex === concepts.length - 1}
+=======
+            disabled={currentSlide === totalSlides - 1}
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           >
             Next <FaArrowRight />
           </button>
@@ -278,4 +417,8 @@ const LearningView = () => {
   );
 };
 
+<<<<<<< HEAD
 export default LearningView;
+=======
+export default LearningView;
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a

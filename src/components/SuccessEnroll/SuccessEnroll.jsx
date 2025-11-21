@@ -27,4 +27,8 @@ const SuccessEnroll = () => {
   );
 };
 
+<<<<<<< HEAD
 export default SuccessEnroll;
+=======
+export default SuccessEnroll;
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a

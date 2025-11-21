@@ -2,15 +2,20 @@ import React, { useState, useContext } from "react";
 import "./Auth.css";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import { AuthContext } from "../../AuthContext";
 
 // Define the API base URL
 export const API_BASE_URL = "https://ceretification-app.onrender.com";
+=======
+import { AuthContext } from "../../AuthContext"; // ✅ Import AuthContext
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
+<<<<<<< HEAD
   const { user, setUser, enrolledCourses } = useContext(AuthContext);
   
   // State for managing Sign In form inputs
@@ -175,6 +180,41 @@ const Auth = () => {
   return (
     <div className="auth-container">
       {/* ===== Left Side (No UI change) ===== */}
+=======
+  // ✅ Get user and enrolledCourses from AuthContext
+  const { user, setUser, enrolledCourses } = useContext(AuthContext);
+
+  // ===== Handle Sign In Submit =====
+  const handleSignIn = (e) => {
+    e.preventDefault();
+
+    // Example: after sign in, set user object (replace with real auth)
+    setUser({ name: "Demo User", email: "demo@example.com" });
+
+    // ✅ Existing user with enrolled courses goes to dashboard
+    if (enrolledCourses.length > 0) {
+      navigate("/dashboard");
+    } else {
+      // ✅ New user stays on landing page
+      navigate("/");
+    }
+  };
+
+  // ===== Handle Sign Up Submit =====
+  const handleSignUp = (e) => {
+    e.preventDefault();
+
+    // Example: after sign up, set user object
+    setUser({ name: "New User", email: "newuser@example.com" });
+
+    // ✅ New user stays on landing page
+    navigate("/");
+  };
+
+  return (
+    <div className="auth-container">
+      {/* ===== Left Side ===== */}
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
       <div className="auth-left">
         <h1>Welcome to EduLearn 🎓</h1>
         <p>Your journey to certification starts here.</p>
@@ -186,7 +226,11 @@ const Auth = () => {
       {/* ===== Right Side ===== */}
       <div className="auth-right">
         <div className="auth-box">
+<<<<<<< HEAD
           {/* ===== Tabs (Sign In / Sign Up) (No UI change) ===== */}
+=======
+          {/* ===== Tabs (Sign In / Sign Up) ===== */}
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           <div className="auth-tabs">
             <button
               className={!isSignUp ? "tab active" : "tab"}
@@ -202,11 +246,16 @@ const Auth = () => {
             </button>
           </div>
 
+<<<<<<< HEAD
           {/* ===== Sign In Form (Integration changes applied) ===== */}
+=======
+          {/* ===== Sign In Form ===== */}
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           {!isSignUp ? (
             <>
               <h2>Sign In to Your Account</h2>
               <form onSubmit={handleSignIn}>
+<<<<<<< HEAD
                 <input 
                   type="email" 
                   placeholder="Email" 
@@ -223,6 +272,10 @@ const Auth = () => {
                   value={signInData.password}
                   onChange={(e) => handleInputChange(e, 'signIn')}
                 />
+=======
+                <input type="email" placeholder="Email" required />
+                <input type="password" placeholder="Password" required />
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
                 <div className="forgot">
                   <button
                     type="button"
@@ -248,11 +301,16 @@ const Auth = () => {
               </form>
             </>
           ) : (
+<<<<<<< HEAD
             /* ===== Create Account Form (Integration changes applied) ===== */
+=======
+            /* ===== Create Account Form ===== */
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
             <>
               <h2>Create a New Account</h2>
               <form onSubmit={handleSignUp}>
                 <div className="name-row">
+<<<<<<< HEAD
                   <input 
                     type="text" 
                     placeholder="First Name" 
@@ -286,10 +344,18 @@ const Auth = () => {
                   value={signUpData.password} 
                   onChange={(e) => handleInputChange(e, 'signUp')} 
                 />
+=======
+                  <input type="text" placeholder="First Name" required />
+                  <input type="text" placeholder="Last Name" required />
+                </div>
+                <input type="email" placeholder="Email" required />
+                <input type="password" placeholder="Password" required />
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
                 <input
                   type="password"
                   placeholder="Confirm Password"
                   required
+<<<<<<< HEAD
                   name="confirmPassword"
                   value={signUpData.confirmPassword}
                   onChange={(e) => handleInputChange(e, 'signUp')}
@@ -302,6 +368,11 @@ const Auth = () => {
                     checked={signUpData.consents.terms}
                     onChange={(e) => handleInputChange(e, 'signUp')}
                   /> I agree to the Terms &
+=======
+                />
+                <label className="checkbox">
+                  <input type="checkbox" required /> I agree to the Terms &
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
                   Privacy Policy
                 </label>
                 <button type="submit" className="primary-btn">
@@ -311,12 +382,20 @@ const Auth = () => {
             </>
           )}
 
+<<<<<<< HEAD
           {/* ===== OR Divider (No UI change) ===== */}
+=======
+          {/* ===== OR Divider ===== */}
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           <div className="divider">
             <span>or</span>
           </div>
 
+<<<<<<< HEAD
           {/* ===== Social Login Buttons (No UI change) ===== */}
+=======
+          {/* ===== Social Login Buttons ===== */}
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
           <div className="social-buttons">
             <button className="google-btn">
               <FaGoogle className="icon" /> Continue with Google
@@ -331,4 +410,8 @@ const Auth = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Auth;
+=======
+export default Auth;
+>>>>>>> cdb24864b6178644b7b3ad57a25dea20de31d29a
