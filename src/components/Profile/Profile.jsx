@@ -1,271 +1,309 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import "./Dashboard.css";
+import { FaCheckCircle } from "react-icons/fa";
 import { AuthContext } from "../../AuthContext";
-import "./Profile.css";
-import { FaTrophy, FaBookOpen, FaHistory, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://ceretification-app.onrender.com";
 
-const Profile = () => {
-  const { user, setUser } = useContext(AuthContext);
+const Dashboard = () => {
   const navigate = useNavigate();
+  const { user, setUser } = useContext(AuthContext);
 
+  const [enrolledTracks, setEnrolledTracks] = useState([]);
+  const [recommended, setRecommended] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // State for Real History Data
-  const [courseHistory, setCourseHistory] = useState([]);
-  const [examHistory, setExamHistory] = useState([]);
-  const [stats, setStats] = useState({
-    completedCourses: 0,
-    totalExams: 0,
-    averageScore: 0
-  });
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef();
 
-  const [profileData, setProfileData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-  });
-
-  // 1. Fetch Latest User Data & History on Mount
+  // Close menu on click outside
   useEffect(() => {
-    const fetchHistory = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-          navigate("/login");
-          return;
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // ===== HELPER: Get Reliable Pixel Art Avatar (for Navbar & Welcome) =====
+  const getAvatar = () => {
+    const name = user?.firstName || "User";
+    // Pixel Art style - reliable and tech-themed
+    return `https://api.dicebear.com/9.x/pixel-art/svg?seed=${name}`;
+  };
+
+  const handleAvatarError = (e) => {
+    // Fallback to generic user icon if API or network fails
+    e.target.src = "https://cdn-icons-png.flaticon.com/512/2436/2436874.png"; 
+  };
+
+  // ===== 1. FETCH DASHBOARD DATA =====
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
       }
 
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      const trackIds = (user.entitlements || [])
+        .filter((e) => e.startsWith("track:"))
+        .map((e) => e.replace("track:", ""));
+
       try {
-        // A. FORCE FETCH LATEST USER DATA (Fixes the "0 Enrolled" issue)
-        const meRes = await fetch(`${API_BASE_URL}/api/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (!meRes.ok) throw new Error("Failed to refresh user data");
-        
-        const freshUser = await meRes.json();
-        // Update Context with fresh data
-        setUser(freshUser); 
-        
-        // Update local profile form
-        setProfileData({
-            firstName: freshUser.firstName || "",
-            lastName: freshUser.lastName || "",
-            email: freshUser.email || "",
-        });
-
-        // B. Get Track IDs from the FRESH user object
-        const trackIds = (freshUser.entitlements || [])
-            .filter(e => e.startsWith("track:"))
-            .map(e => e.replace("track:", ""));
-
-        // If no enrollments, stop here
-        if (trackIds.length === 0) {
-            setLoading(false);
-            return;
-        }
-
-        const courses = [];
-        const exams = [];
-        let completedCount = 0;
-        let totalScore = 0;
-        let scoreCount = 0;
-
-        // C. Fetch Details for each track
-        await Promise.all(trackIds.map(async (trackId) => {
-            // Get Track Info
+        const trackPromises = trackIds.map(async (trackId) => {
+          try {
             const trackRes = await fetch(`${API_BASE_URL}/api/tracks/${trackId}`);
-            const trackData = trackRes.ok ? await trackRes.json() : null;
+            if (!trackRes.ok) return null;
+            const trackData = await trackRes.json();
 
-            // Get Progress
             const progRes = await fetch(`${API_BASE_URL}/api/progress/${trackId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+              headers: { Authorization: `Bearer ${token}` },
             });
-            const progData = progRes.ok ? await progRes.json() : null;
+            const progData = progRes.ok ? await progRes.json() : { conceptStatuses: [] };
 
-            if (trackData && progData) {
-                // --- Course Calculation ---
-                const done = progData.conceptStatuses?.length || 0;
-                const total = trackData.concepts_count || 1;
-                const pct = Math.round((done / total) * 100);
-                const finalPct = pct > 100 ? 100 : pct;
-                
-                if (finalPct === 100) completedCount++;
+            const completed = progData.conceptStatuses?.length || 0;
+            const total = trackData.concepts_count || 1;
+            const rawPercent = (completed / total) * 100;
+            const percentage = Math.round(rawPercent > 100 ? 100 : rawPercent);
 
-                courses.push({
-                    id: trackData._id || trackData.id,
-                    title: trackData.title,
-                    progress: finalPct,
-                    status: finalPct === 100 ? "Completed" : "In Progress"
-                });
-
-                // --- Exam Calculation ---
-                if (progData.examStats) {
-                    progData.examStats.forEach(stat => {
-                        scoreCount++;
-                        totalScore += stat.bestScore;
-                        
-                        exams.push({
-                           id: stat.examId, 
-                           trackTitle: trackData.title,
-                           score: stat.bestScore,
-                           attempts: stat.attempts,
-                           passed: stat.bestScore >= 70
-                        });
-                    });
-                }
-            }
-        }));
-
-        setCourseHistory(courses);
-        setExamHistory(exams);
-        setStats({
-            completedCourses: completedCount,
-            totalExams: exams.length,
-            averageScore: scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0
+            return {
+              ...trackData,
+              id: trackData._id || trackData.id,
+              progress: percentage,
+            };
+          } catch (err) {
+            console.error(`Error fetching track ${trackId}:`, err);
+            return null;
+          }
         });
 
-      } catch (err) {
-        console.error("History fetch error:", err);
+        const recRes = await fetch(`${API_BASE_URL}/api/tracks?status=active&limit=3`);
+        const recData = recRes.ok ? await recRes.json() : [];
+
+        const results = await Promise.all(trackPromises);
+        const validEnrolled = results.filter((t) => t !== null);
+
+        setEnrolledTracks(validEnrolled);
+
+        const enrolledIds = new Set(validEnrolled.map((t) => t.id));
+        const validRec = recData.filter((t) => !enrolledIds.has(t._id));
+        setRecommended(validRec);
+
+      } catch (error) {
+        console.error("Dashboard data error:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchHistory();
-  }, [navigate, setUser]); // Depend on setUser to update context
+    fetchDashboardData();
+  }, [user, navigate]);
 
-
-  // Handlers
-  const handleChange = (e) => {
-    setProfileData({ ...profileData, [e.target.name]: e.target.value });
+  // ===== HANDLERS (Omitted for brevity, but exist in full code) =====
+  const handleContinueLearning = (track) => {
+    navigate("/learning", { state: { trackId: track.id, trackName: track.title } });
+  };
+  const handleTakeExam = (track) => {
+    navigate("/exam-catalog", { state: { trackId: track.id, trackName: track.title } });
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    setUser(null);
+    setShowMenu(false); // Hide dropdown on logout
+    navigate("/");
+  };
+  const handleBrowseMore = () => {
+    navigate("/", { state: { scrollTo: "courses" } });
   };
 
-  const handleSave = () => {
-    alert("Profile update saved locally (Backend update not implemented yet).");
-  };
-
-  const handleDeleteAccount = async () => {
-    if(!window.confirm("Are you sure? This cannot be undone.")) return;
-    // ... existing delete logic ...
-  };
-
-  if (!user) return <div className="profile-wrapper"><p>Loading Profile...</p></div>;
+  const lastStudiedTrack = enrolledTracks.find(t => t.progress < 100) || enrolledTracks[0];
 
   return (
-    <div className="profile-wrapper">
-      <div className="profile-container">
-        <h1 className="profile-title highlight">
-          <span role="img" aria-label="avatar" style={{marginRight: '8px', verticalAlign: 'middle'}}>👤</span> My Profile & History
-        </h1>
-        <div className="profile-card">
-          <div className="profile-header-row">
-            <div className="profile-avatar-box">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
-                alt="User Avatar"
-                className="profile-avatar"
-              />
-            </div>
-            <div className="profile-name-editrow">
-              <input name="firstName" value={profileData.firstName} onChange={handleChange} placeholder="First Name" className="profile-name-input"/>
-              <input name="lastName" value={profileData.lastName} onChange={handleChange} placeholder="Last Name" className="profile-name-input"/>
-              <button className="save-btn sticky-save" onClick={handleSave}>
-                <span role="img" aria-label="Save">💾</span> Save
-              </button>
-            </div>
-          </div>
-          <div className="profile-email"><p>{profileData.email}</p></div>
-          {/* ===== Stats Row ===== */}
-          <div className="stats-grid">
-            <div className="stat-box">
-              <FaCheckCircle className="icon-green" />
-              <h3>{stats.completedCourses}</h3>
-              <p>Courses Completed</p>
-            </div>
-            <div className="stat-box">
-              <FaBookOpen className="icon-blue" />
-              <h3>{courseHistory.length}</h3>
-              <p>Enrolled</p>
-            </div>
-            <div className="stat-box">
-              <FaTrophy className="icon-yellow" />
-              <h3>{stats.averageScore}%</h3>
-              <p>Avg. Score</p>
-            </div>
-          </div>
-        </div>
-        {/* ===== Course History Table ===== */}
-        <div className="history-section">
-          <h2><FaBookOpen /> Course History</h2>
-          {loading ? <p>Loading...</p> : courseHistory.length === 0 ? (
-            <div style={{padding: '10px', color: '#666', background: '#f9fafb', borderRadius: '8px'}}>
-              You haven't enrolled in any courses yet. <a href="/dashboard" style={{color: '#10B981'}}>Go to Dashboard</a>
-            </div>
-          ) : (
-            <table className="history-table">
-              <thead>
-                <tr>
-                  <th>Course</th>
-                  <th>Progress</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {courseHistory.map((c, i) => (
-                  <tr key={i}>
-                    <td>{c.title}</td>
-                    <td>
-                      <div className="mini-progress-bar">
-                        <div className="mini-fill" style={{width: `${c.progress}%`, background: c.progress===100 ? '#10B981':'#3B82F6'}}></div>
-                      </div>
-                      <span className="mini-text">{c.progress}%</span>
-                    </td>
-                    <td>
-                      <span className={`status-badge ${c.status === 'Completed' ? 'success' : 'pending'}`}>{c.status}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-        {/* ===== Exam History Table ===== */}
-        <div className="history-section">
-          <h2><FaHistory /> Exam Performance</h2>
-          {loading ? <p>Loading...</p> : examHistory.length === 0 ? <p>No exams taken yet.</p> : (
-            <table className="history-table">
-              <thead>
-                <tr>
-                  <th>Track / Exam</th>
-                  <th>Attempts</th>
-                  <th>Best Score</th>
-                  <th>Result</th>
-                </tr>
-              </thead>
-              <tbody>
-                {examHistory.map((e, i) => (
-                  <tr key={i}>
-                    <td>{e.trackTitle}</td>
-                    <td>{e.attempts}</td>
-                    <td style={{fontWeight: 'bold'}}>{e.score}%</td>
-                    <td>{e.passed ? (<span className="status-badge success"><FaCheckCircle/> Passed</span>) : (<span className="status-badge fail"><FaTimesCircle/> Failed</span>)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-        {/* Delete Account */}
-        <div style={{marginTop: '40px', textAlign: 'center'}}>
-          <button className="delete-btn-text" onClick={handleDeleteAccount} style={{background:'none', border:'none', color:'red', cursor:'pointer', textDecoration:'underline'}}>
-            Delete My Account
+    <div className="dashboard">
+      {/* ===== NAVBAR ===== */}
+      <header className="navbar">
+        <h1 className="logo" onClick={() => navigate("/")} style={{cursor: 'pointer'}}>Edora</h1>
+        <nav className="nav-links">
+          <span className="active">Dashboard</span>
+        </nav>
+        <div className="nav-right">
+          <button className="browse-btn" onClick={handleBrowseMore}>
+            Browse More
           </button>
+          <div className="profile-dropdown" ref={menuRef}>
+            <div className="nav-avatar-container" onClick={() => setShowMenu((prev) => !prev)}>
+                <img 
+                    src={getAvatar()} 
+                    alt="Profile" 
+                    className="nav-avatar-img" 
+                    onError={handleAvatarError}
+                />
+            </div>
+            {showMenu && (
+              <div className="dropdown-menu" style={{display: 'block'}}>
+                <button onClick={() => { setShowMenu(false); navigate("/profile") }}>Profile</button>
+                <button className="logout" onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
         </div>
+      </header>
+
+      {/* ===== HERO BANNER ===== */}
+      <div className="hero-banner">
+        <div className="hero-content">
+          <div className="welcome-container">
+            {/* ✅ RESTORED WELCOME AVATAR */}
+            <div className="welcome-avatar-wrapper">
+                <img 
+                    src={getAvatar()} 
+                    alt="Welcome Avatar" 
+                    className="welcome-avatar-img"
+                    onError={handleAvatarError}
+                />
+            </div>
+            
+            <div className="welcome-text">
+              <h2>Welcome Back, {user?.firstName || "Learner"}!</h2>
+              <p>Your journey to mastery continues — keep learning, keep growing!</p>
+            </div>
+          </div>
+        </div>
+        <button className="browse-tracks-btn" onClick={handleBrowseMore}>
+          Browse New Tracks
+        </button>
       </div>
+
+      {/* ===== MY LEARNING TRACKS (Enrolled) ===== */}
+      <section className="learning-tracks">
+        <h2 className="section-title">My Learning Tracks</h2>
+
+        {loading ? (
+          <p>Loading your progress...</p>
+        ) : enrolledTracks.length === 0 ? (
+          <div className="empty-state">
+            <p>You haven't enrolled in any tracks yet.</p>
+            <button className="btn continue" onClick={handleBrowseMore} style={{marginTop: '10px'}}>
+              Explore Courses
+            </button>
+          </div>
+        ) : (
+          <div className="tracks-grid">
+            {enrolledTracks.map((track) => {
+              const isCompleted = track.progress >= 100;
+
+              return (
+                <div key={track.id} className={`track-card ${isCompleted ? "completed-card" : ""}`}>
+                  <div className="track-img-wrapper" style={{position: 'relative', display: 'inline-block'}}>
+                    <img
+                      src={track.cover_image} 
+                      alt={track.title}
+                      className="track-icon-img"
+                      onError={handleAvatarError} 
+                    />
+                    
+                    {isCompleted && (
+                      <div className="completed-badge" style={{
+                          position: 'absolute',
+                          top: '-10px',
+                          right: '-10px',
+                          background: '#10B981',
+                          color: 'white',
+                          borderRadius: '50%',
+                          padding: '5px',
+                          fontSize: '12px',
+                          display: 'flex', 
+                          alignItems: 'center',
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                      }}>
+                        <FaCheckCircle size={16} />
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 className="track-title">{track.title}</h3>
+                  
+                  <div className="progress-container">
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{ 
+                            width: `${track.progress}%`,
+                            backgroundColor: isCompleted ? '#10B981' : '#2563eb' 
+                        }}
+                      ></div>
+                    </div>
+                    <span className="progress-text" style={{color: isCompleted ? '#10B981' : '#666'}}>
+                        {isCompleted ? "100% Completed" : `${track.progress}% completed`}
+                    </span>
+                  </div>
+
+                  <div className="track-actions">
+                    <button
+                      className="btn continue"
+                      onClick={() => handleContinueLearning(track)}
+                      style={isCompleted ? {backgroundColor: '#059669'} : {}}
+                    >
+                      {isCompleted ? "Review Course" : "Continue Learning"}
+                    </button>
+                    
+                    <button className="btn exam" onClick={() => handleTakeExam(track)}>
+                      Take Exam
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* ===== RECOMMENDED (Available to Enroll) ===== */}
+      {recommended.length > 0 && (
+        <section className="recommended">
+          <div className="section-header-center">
+             <h2 className="recommended-badge">Recommended Courses For You</h2>
+          </div>
+
+          <div className="rec-grid">
+            {recommended.map((rec) => (
+              <div key={rec._id} className="rec-card">
+                <img
+                  src={rec.cover_image}
+                  alt={rec.title}
+                  className="rec-icon-img"
+                  onError={handleAvatarError}
+                />
+                <h3 className="rec-title">{rec.title}</h3>
+                <button
+                  className="view-details-btn"
+                  onClick={() => navigate(`/track/${rec._id}`)}
+                >
+                  View Details
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ===== FOOTER ===== */}
+      <footer className="footer">
+        <p>Terms | Privacy | Contact</p>
+        <p>© 2025 Edora — Learn. Grow. Achieve.</p>
+      </footer>
     </div>
   );
 };
 
-export default Profile;
+export default Dashboard;
