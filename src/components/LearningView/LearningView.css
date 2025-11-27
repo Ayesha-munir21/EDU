@@ -97,12 +97,58 @@
 /* ===== Slide Content ===== */
 .slide-body {
   flex: 1;
+  overflow-y: auto; /* Allow scrolling if content is long */
 }
 
-.explanation {
-  font-size: 1rem;
-  margin-bottom: 20px;
+/* ✅ MARKDOWN STYLES (Added for Formatting) */
+.markdown-content {
   color: #374151;
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3 {
+  color: #111827;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.25rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 5px;
+}
+
+.markdown-content ul {
+  margin-left: 20px;
+  margin-bottom: 1rem;
+  list-style-type: disc;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content strong {
+  color: #000;
+  font-weight: 700;
+}
+
+.markdown-content code {
+  background-color: #f3f4f6;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #d97706;
+  font-size: 0.9em;
+}
+
+/* Existing Containers */
+.explanation {
+  margin-bottom: 20px;
 }
 
 .example-box {
@@ -119,12 +165,13 @@
   padding: 10px;
   border-radius: 8px;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start; /* Changed to align icon with text top */
+  gap: 10px;
 }
 
 .tip-icon {
   color: #10b981;
+  margin-top: 4px; /* Align with text line */
 }
 
 /* ===== Footer Navigation ===== */
