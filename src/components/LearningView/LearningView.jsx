@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
+import ReactMarkdown from "react-markdown"; // ✅ Import Markdown Renderer
 
 const API_BASE_URL = "https://ceretification-app.onrender.com"; 
 
@@ -63,7 +64,6 @@ const LearningView = () => {
         }));
         setModules(moduleList);
 
-
         // C. Fetch User Progress
         const progRes = await fetch(`${API_BASE_URL}/api/progress/${trackId}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -90,7 +90,7 @@ const LearningView = () => {
 
   // ===== HANDLERS =====
   
-  // Robust Click Handler for sidebar (FIXED)
+  // Robust Click Handler for sidebar
   const handleSlideClick = (clickedConcept) => {
     const clickedId = getConceptId(clickedConcept);
     const index = concepts.findIndex((c) => getConceptId(c) === clickedId);
@@ -140,12 +140,16 @@ const LearningView = () => {
   if (loading) return <div style={{padding: "20px", textAlign: "center"}}>Loading Course Content...</div>;
   if (concepts.length === 0) return <div style={{padding: "20px", textAlign: "center"}}>No content available for this track yet.</div>;
 
-  // Safe access to slide content
   const slideContent = currentConcept?.slide || {
     explanation: "Content loading...",
     example: "Please wait...",
     tip: ""
   };
+
+  // Ensure newlines are respected
+  const cleanExplanation = slideContent.explanation ? slideContent.explanation.replace(/\\n/g, '\n') : "";
+  const cleanExample = slideContent.example ? slideContent.example.replace(/\\n/g, '\n') : "";
+  const cleanTip = slideContent.tip ? slideContent.tip.replace(/\\n/g, '\n') : "";
 
   return (
     <div className="learning-container">
@@ -182,7 +186,6 @@ const LearningView = () => {
           </div>
         ))}
 
-        {/* ===== Take Exam Tab ===== */}
         <div className="module">
           <div
             className="module-title"
@@ -221,22 +224,30 @@ const LearningView = () => {
         </div>
 
         <div className="slide-body">
-          <p className="explanation">{slideContent.explanation}</p>
+          {/* ✅ UPDATED: Using ReactMarkdown for proper formatting */}
+          <div className="explanation markdown-content">
+            <ReactMarkdown>{cleanExplanation}</ReactMarkdown>
+          </div>
           
-          {slideContent.example && (
+          {cleanExample && (
              <div className="example-box">
-                <strong>Example:</strong> {slideContent.example}
+                <strong>Example:</strong>
+                <div className="markdown-content" style={{marginTop:'5px'}}>
+                   <ReactMarkdown>{cleanExample}</ReactMarkdown>
+                </div>
              </div>
           )}
           
-          {slideContent.tip && (
+          {cleanTip && (
               <div className="tip-box">
-                <FaLightbulb className="tip-icon" /> {slideContent.tip}
+                <FaLightbulb className="tip-icon" /> 
+                <div className="markdown-content">
+                   <ReactMarkdown>{cleanTip}</ReactMarkdown>
+                </div>
               </div>
           )}
         </div>
 
-        {/* ===== Bottom Navigation ===== */}
         <div className="slide-footer">
           <button
             className="nav-btn"
