@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
+import ReactMarkdown from "react-markdown";
 
 const API_BASE_URL = "https://ceretification-app.onrender.com"; 
 
@@ -63,7 +64,6 @@ const LearningView = () => {
         }));
         setModules(moduleList);
 
-
         // C. Fetch User Progress
         const progRes = await fetch(`${API_BASE_URL}/api/progress/${trackId}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -90,7 +90,6 @@ const LearningView = () => {
 
   // ===== HANDLERS =====
   
-  // Robust Click Handler for sidebar (FIXED)
   const handleSlideClick = (clickedConcept) => {
     const clickedId = getConceptId(clickedConcept);
     const index = concepts.findIndex((c) => getConceptId(c) === clickedId);
@@ -135,7 +134,7 @@ const LearningView = () => {
         console.error("Failed to save progress:", error);
     }
   };
-
+  
   if (!trackId) return <div style={{padding: "20px"}}>No track selected. Go back to Dashboard.</div>;
   if (loading) return <div style={{padding: "20px", textAlign: "center"}}>Loading Course Content...</div>;
   if (concepts.length === 0) return <div style={{padding: "20px", textAlign: "center"}}>No content available for this track yet.</div>;
@@ -146,6 +145,11 @@ const LearningView = () => {
     example: "Please wait...",
     tip: ""
   };
+
+  // ✅ FIX: define cleaned variables
+  const cleanExplanation = slideContent.explanation || "";
+  const cleanExample = slideContent.example || "";
+  const cleanTip = slideContent.tip || "";
 
   return (
     <div className="learning-container">
@@ -219,39 +223,30 @@ const LearningView = () => {
             ></div>
           </div>
         </div>
-
-       <div className="slide-body">
-  {/* Explanation in bullet points */}
-  {slideContent.explanation && (
-    <div>
-      <strong>Key Points:</strong>
-      <ul>
-        {slideContent.explanation.split("\n").map((point, idx) => (
-          <li key={idx}>{point}</li>
-        ))}
-      </ul>
-    </div>
-  )}
-  
-  {/* Example in bullet points */}
-  {slideContent.example && (
-     <div className="example-box">
-        <strong>Example:</strong>
-        <ul>
-          {slideContent.example.split("\n").map((ex, idx) => (
-            <li key={idx}>{ex}</li>
-          ))}
-        </ul>
-     </div>
-  )}
-  
-  {slideContent.tip && (
-      <div className="tip-box">
-        <FaLightbulb className="tip-icon" /> {slideContent.tip}
-      </div>
-  )}
-</div>
-
+        <div className="slide-body">
+          {/* ✅ ReactMarkdown for content */}
+          <div className="explanation markdown-content">
+            <ReactMarkdown>{cleanExplanation}</ReactMarkdown>
+          </div>
+          
+          {cleanExample && (
+             <div className="example-box">
+                <strong>Example:</strong>
+                <div className="markdown-content" style={{marginTop:'5px'}}>
+                   <ReactMarkdown>{cleanExample}</ReactMarkdown>
+                </div>
+             </div>
+          )}
+          
+          {cleanTip && (
+              <div className="tip-box">
+                <FaLightbulb className="tip-icon" /> 
+                <div className="markdown-content">
+                   <ReactMarkdown>{cleanTip}</ReactMarkdown>
+                </div>
+              </div>
+          )}
+        </div>
 
         {/* ===== Bottom Navigation ===== */}
         <div className="slide-footer">
