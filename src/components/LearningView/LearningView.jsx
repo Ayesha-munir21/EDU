@@ -220,21 +220,38 @@ const LearningView = () => {
           </div>
         </div>
 
-        <div className="slide-body">
-          <p className="explanation">{slideContent.explanation}</p>
-          
-          {slideContent.example && (
-             <div className="example-box">
-                <strong>Example:</strong> {slideContent.example}
-             </div>
-          )}
-          
-          {slideContent.tip && (
-              <div className="tip-box">
-                <FaLightbulb className="tip-icon" /> {slideContent.tip}
-              </div>
-          )}
-        </div>
+       <div className="slide-body">
+  {/* Explanation in bullet points */}
+  {slideContent.explanation && (
+    <div>
+      <strong>Key Points:</strong>
+      <ul>
+        {slideContent.explanation.split("\n").map((point, idx) => (
+          <li key={idx}>{point}</li>
+        ))}
+      </ul>
+    </div>
+  )}
+  
+  {/* Example in bullet points */}
+  {slideContent.example && (
+     <div className="example-box">
+        <strong>Example:</strong>
+        <ul>
+          {slideContent.example.split("\n").map((ex, idx) => (
+            <li key={idx}>{ex}</li>
+          ))}
+        </ul>
+     </div>
+  )}
+  
+  {slideContent.tip && (
+      <div className="tip-box">
+        <FaLightbulb className="tip-icon" /> {slideContent.tip}
+      </div>
+  )}
+</div>
+
 
         {/* ===== Bottom Navigation ===== */}
         <div className="slide-footer">
