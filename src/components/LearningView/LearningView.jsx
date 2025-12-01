@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "react-markdown"; // ✅ Import Markdown Renderer
 
 const API_BASE_URL = "https://ceretification-app.onrender.com"; 
 
@@ -90,6 +90,7 @@ const LearningView = () => {
 
   // ===== HANDLERS =====
   
+  // Robust Click Handler for sidebar
   const handleSlideClick = (clickedConcept) => {
     const clickedId = getConceptId(clickedConcept);
     const index = concepts.findIndex((c) => getConceptId(c) === clickedId);
@@ -139,7 +140,6 @@ const LearningView = () => {
   if (loading) return <div style={{padding: "20px", textAlign: "center"}}>Loading Course Content...</div>;
   if (concepts.length === 0) return <div style={{padding: "20px", textAlign: "center"}}>No content available for this track yet.</div>;
 
-  // Safe access to slide content
   const slideContent = currentConcept?.slide || {
     explanation: "Content loading...",
     example: "Please wait...",
@@ -186,7 +186,6 @@ const LearningView = () => {
           </div>
         ))}
 
-        {/* ===== Take Exam Tab ===== */}
         <div className="module">
           <div
             className="module-title"
@@ -248,7 +247,6 @@ const LearningView = () => {
           )}
         </div>
 
-        {/* ===== Bottom Navigation ===== */}
         <div className="slide-footer">
           <button
             className="nav-btn"

@@ -4,19 +4,22 @@ import { AuthContext } from "../../AuthContext";
 import "./Profile.css";
 import { FaTrophy, FaBookOpen, FaHistory, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://ceretification-app.onrender.com"; 
 
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   
-  // State for Real History Data
   const [courseHistory, setCourseHistory] = useState([]);
   const [examHistory, setExamHistory] = useState([]);
+  
+  // Stats State
   const [stats, setStats] = useState({
     completedCourses: 0,
+    enrolledCourses: 0,
     totalExams: 0,
     averageScore: 0
   });
@@ -29,40 +32,47 @@ const Profile = () => {
 
   // 1. Fetch Latest User Data & History on Mount
   useEffect(() => {
+    if (user) {
+        setProfileData({
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            email: user.email || "",
+        });
+    }
+
     const fetchHistory = async () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
-          navigate("/login");
+          navigate("/auth"); // Redirect if not logged in
           return;
       }
 
       try {
-        // A. FORCE FETCH LATEST USER DATA (Fixes the "0 Enrolled" issue)
+        // A. FORCE FETCH LATEST USER DATA (Sync Enrolled Count)
         const meRes = await fetch(`${API_BASE_URL}/api/me`, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        
         if (!meRes.ok) throw new Error("Failed to refresh user data");
         
         const freshUser = await meRes.json();
-        // Update Context with fresh data
         setUser(freshUser); 
         
-        // Update local profile form
+        // Update local form data
         setProfileData({
             firstName: freshUser.firstName || "",
             lastName: freshUser.lastName || "",
             email: freshUser.email || "",
         });
 
-        // B. Get Track IDs from the FRESH user object
+        // B. Get Track IDs from fresh user data
         const trackIds = (freshUser.entitlements || [])
             .filter(e => e.startsWith("track:"))
             .map(e => e.replace("track:", ""));
 
-        // If no enrollments, stop here
         if (trackIds.length === 0) {
             setLoading(false);
+            // Set stats to 0 if no tracks
+            setStats({ completedCourses: 0, enrolledCourses: 0, totalExams: 0, averageScore: 0 });
             return;
         }
 
@@ -74,54 +84,72 @@ const Profile = () => {
 
         // C. Fetch Details for each track
         await Promise.all(trackIds.map(async (trackId) => {
-            // Get Track Info
-            const trackRes = await fetch(`${API_BASE_URL}/api/tracks/${trackId}`);
-            const trackData = trackRes.ok ? await trackRes.json() : null;
+            try {
+                // Fetch Track Info
+                const trackRes = await fetch(`${API_BASE_URL}/api/tracks/${trackId}`);
+                const trackData = trackRes.ok ? await trackRes.json() : null;
 
-            // Get Progress
-            const progRes = await fetch(`${API_BASE_URL}/api/progress/${trackId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const progData = progRes.ok ? await progRes.json() : null;
-
-            if (trackData && progData) {
-                // --- Course Calculation ---
-                const done = progData.conceptStatuses?.length || 0;
-                const total = trackData.concepts_count || 1;
-                const pct = Math.round((done / total) * 100);
-                const finalPct = pct > 100 ? 100 : pct;
-                
-                if (finalPct === 100) completedCount++;
-
-                courses.push({
-                    id: trackData._id || trackData.id,
-                    title: trackData.title,
-                    progress: finalPct,
-                    status: finalPct === 100 ? "Completed" : "In Progress"
+                // Fetch Progress
+                const progRes = await fetch(`${API_BASE_URL}/api/progress/${trackId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
                 });
+                const progData = progRes.ok ? await progRes.json() : { conceptStatuses: [], examStats: [] };
 
-                // --- Exam Calculation ---
-                if (progData.examStats) {
-                    progData.examStats.forEach(stat => {
-                        scoreCount++;
-                        totalScore += stat.bestScore;
-                        
-                        exams.push({
-                           id: stat.examId, 
-                           trackTitle: trackData.title,
-                           score: stat.bestScore,
-                           attempts: stat.attempts,
-                           passed: stat.bestScore >= 70
-                        });
+                if (trackData) {
+                    // --- LOGIC: Calculate Real Progress (Slides + Exams) ---
+                    const totalSlides = trackData.concepts_count || 0;
+                    const totalExams = trackData.exams_count || 0;
+                    const totalItems = totalSlides + totalExams;
+
+                    const doneSlides = (progData.conceptStatuses || []).filter(s => s.status === 'understood').length;
+                    const passedExams = (progData.examStats || []).filter(s => s.bestScore >= 70).length;
+                    
+                    const totalDone = doneSlides + passedExams;
+
+                    let pct = 0;
+                    if (totalItems > 0) {
+                        pct = Math.round((totalDone / totalItems) * 100);
+                    }
+                    if (pct > 100) pct = 100;
+                    
+                    // Increment Completed Course Count if 100%
+                    if (pct === 100) completedCount++;
+
+                    courses.push({
+                        id: trackData._id || trackData.id,
+                        title: trackData.title,
+                        progress: pct,
+                        status: pct === 100 ? "Completed" : "In Progress"
                     });
+
+                    // --- Process Exams for History Table ---
+                    if (progData.examStats) {
+                        progData.examStats.forEach(stat => {
+                            scoreCount++;
+                            totalScore += stat.bestScore;
+                            
+                            exams.push({
+                               id: stat.examId, 
+                               trackTitle: trackData.title,
+                               score: stat.bestScore,
+                               attempts: stat.attempts,
+                               passed: stat.bestScore >= 70
+                            });
+                        });
+                    }
                 }
+            } catch (e) {
+                console.error("Error fetching track:", e);
             }
         }));
 
+        // Update State with Real Data
         setCourseHistory(courses);
         setExamHistory(exams);
+        
         setStats({
             completedCourses: completedCount,
+            enrolledCourses: trackIds.length, // Accurate count from DB
             totalExams: exams.length,
             averageScore: scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0
         });
@@ -134,22 +162,14 @@ const Profile = () => {
     };
 
     fetchHistory();
-  }, [navigate, setUser]); // Depend on setUser to update context
+  }, [navigate, setUser]); // Removed user dependency to prevent loops, uses internal check
 
 
   // Handlers
-  const handleChange = (e) => {
-    setProfileData({ ...profileData, [e.target.name]: e.target.value });
-  };
-
-  const handleSave = () => {
-    alert("Profile update saved locally (Backend update not implemented yet).");
-  };
-
-  const handleDeleteAccount = async () => {
-    if(!window.confirm("Are you sure? This cannot be undone.")) return;
-    // ... existing delete logic ...
-  };
+  const handleEditToggle = () => setIsEditing(!isEditing);
+  const handleChange = (e) => setProfileData({ ...profileData, [e.target.name]: e.target.value });
+  const handleSave = () => { setIsEditing(false); alert("Profile updated locally (Backend sync pending)."); };
+  const handleDeleteAccount = async () => { if(window.confirm("Are you sure? This cannot be undone.")) return; };
 
   if (!user) return <div className="profile-wrapper"><p>Loading Profile...</p></div>;
 
@@ -169,15 +189,24 @@ const Profile = () => {
               />
             </div>
             <div className="profile-name-editrow">
-              <input name="firstName" value={profileData.firstName} onChange={handleChange} placeholder="First Name" className="profile-name-input"/>
-              <input name="lastName" value={profileData.lastName} onChange={handleChange} placeholder="Last Name" className="profile-name-input"/>
-              <button className="save-btn sticky-save" onClick={handleSave}>
-                <span role="img" aria-label="Save">💾</span> Save
+              {!isEditing ? (
+                  <>
+                    <h2 style={{margin:0, fontSize:'1.5rem', color:'#14532d'}}>{profileData.firstName} {profileData.lastName}</h2>
+                  </>
+              ) : (
+                  <>
+                    <input name="firstName" value={profileData.firstName} onChange={handleChange} placeholder="First Name" className="profile-name-input"/>
+                    <input name="lastName" value={profileData.lastName} onChange={handleChange} placeholder="Last Name" className="profile-name-input"/>
+                  </>
+              )}
+              <button className="save-btn sticky-save" onClick={!isEditing ? handleEditToggle : handleSave}>
+                {isEditing ? "💾 Save" : "✏️ Edit"}
               </button>
             </div>
           </div>
           <div className="profile-email"><p>{profileData.email}</p></div>
-          {/* ===== Stats Row ===== */}
+          
+          {/* ===== Stats Row (Values now sync with DB) ===== */}
           <div className="stats-grid">
             <div className="stat-box">
               <FaCheckCircle className="icon-green" />
@@ -186,7 +215,7 @@ const Profile = () => {
             </div>
             <div className="stat-box">
               <FaBookOpen className="icon-blue" />
-              <h3>{courseHistory.length}</h3>
+              <h3>{stats.enrolledCourses}</h3>
               <p>Enrolled</p>
             </div>
             <div className="stat-box">
@@ -196,6 +225,7 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
         {/* ===== Course History Table ===== */}
         <div className="history-section">
           <h2><FaBookOpen /> Course History</h2>
@@ -231,6 +261,7 @@ const Profile = () => {
             </table>
           )}
         </div>
+
         {/* ===== Exam History Table ===== */}
         <div className="history-section">
           <h2><FaHistory /> Exam Performance</h2>
@@ -257,12 +288,14 @@ const Profile = () => {
             </table>
           )}
         </div>
+
         {/* Delete Account */}
         <div style={{marginTop: '40px', textAlign: 'center'}}>
-          <button className="delete-btn-text" onClick={handleDeleteAccount} style={{background:'none', border:'none', color:'red', cursor:'pointer', textDecoration:'underline'}}>
-            Delete My Account
-          </button>
+             <button className="delete-btn-text" onClick={handleDeleteAccount} style={{background:'none', border:'none', color:'red', cursor:'pointer', textDecoration:'underline'}}>
+                Delete My Account
+             </button>
         </div>
+
       </div>
     </div>
   );
